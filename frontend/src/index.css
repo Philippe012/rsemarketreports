@@ -1,0 +1,154 @@
+@import "tailwindcss";
+:root {
+    --bg: #f7f7f6;
+    --bg-subtle: #f0f0ee;
+    --surface: #ffffff;
+    --surface-hover: #f6f6f5;
+    --border: #e2e2df;
+    --border-strong: #cccccc;
+    --text: #17181a;
+    --text-secondary: #5c5f63;
+    --text-muted: #8a8d91;
+    --brand: #146c43;
+    --brand-hover: #0f5334;
+    --brand-soft: #e8f3ec;
+    --brand-contrast: #ffffff;
+    --neutral-icon: #f0f0ee;
+    --neutral-icon-fg: #5c5f63;
+    --positive: #157a3d;
+    --positive-soft: #e7f5eb;
+    --negative: #ae2a22;
+    --negative-soft: #fbeceb;
+    --neutral-chip: #5c5f63;
+    --neutral-chip-soft: #eeeeec;
+    --warning: #a1590a;
+    --warning-soft: #fbf0e1;
+    --shadow-sm: 0 1px 2px rgba(20, 20, 18, 0.05);
+    --shadow-md: 0 6px 20px rgba(20, 20, 18, 0.07);
+    --shadow-lg: 0 16px 48px rgba(20, 20, 18, 0.1);
+    --chart-previous: #d3d4d1;
+    --chart-today: #146c43;
+    --chart-grid: #e2e2df;
+    --chart-axis: #8a8d91;
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    --bg: #111213;
+    --bg-subtle: #17181a;
+    --surface: #1b1d1f;
+    --surface-hover: #232527;
+    --border: #2c2f32;
+    --border-strong: #3c4044;
+    --text: #eeefef;
+    --text-secondary: #a4a8ac;
+    --text-muted: #75797d;
+    --brand: #2f9e63;
+    --brand-hover: #3fbd78;
+    --brand-soft: #142a1f;
+    --brand-contrast: #07130d;
+    --neutral-icon: #232527;
+    --neutral-icon-fg: #a4a8ac;
+    --positive: #34c47a;
+    --positive-soft: #10281c;
+    --negative: #e2665e;
+    --negative-soft: #2b1917;
+    --neutral-chip: #a4a8ac;
+    --neutral-chip-soft: #232527;
+    --warning: #d99a3c;
+    --warning-soft: #2a2214;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+    --chart-previous: #3c4044;
+    --chart-today: #34c47a;
+    --chart-grid: #2c2f32;
+    --chart-axis: #75797d;
+    color-scheme: dark;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+::selection {
+    background: var(--brand-soft);
+    color: var(--brand);
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.35s ease both;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -400px 0;
+    }
+    100% {
+        background-position: 400px 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--bg-subtle) 25%, var(--surface-hover) 37%, var(--bg-subtle) 63%);
+    background-size: 800px 100%;
+    animation: shimmer 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-fade-in {
+        animation: none;
+    }
+    .skeleton {
+        animation: none;
+    }
+}
