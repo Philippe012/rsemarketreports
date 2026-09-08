@@ -1,4 +1,3 @@
-from __future__ import annotations
 import pymupdf as fitz
 from typing import List
 
