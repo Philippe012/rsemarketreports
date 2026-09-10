@@ -1,19 +1,32 @@
 import io
 import os
 
+import openpyxl
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.test import SimpleTestCase, TestCase
 
 from reports.models import Report
 from services.normalization.validate_data import _validate_bond_list
+
+User = get_user_model()
 
 SAMPLE_DIR = os.path.join(settings.BASE_DIR.parent, 'sample_data')
 SAMPLE_PDF = os.path.join(SAMPLE_DIR, 'RSE_sample.pdf')
 SAMPLE_XLSX = os.path.join(SAMPLE_DIR, 'RSE_sample.xlsx')
 
 
-class ReportUploadPdfTests(TestCase):
+class AuthenticatedTestCase(TestCase):
+
     def setUp(self):
+        self.user = User.objects.create_user(username='tester@example.com', email='tester@example.com', password='test-pass-123')
+        self.client.login(username='tester@example.com', password='test-pass-123')
+        super().setUp()
+
+
+class ReportUploadPdfTests(AuthenticatedTestCase):
+    def setUp(self):
+        super().setUp()
         with open(SAMPLE_PDF, 'rb') as f:
             self.response = self.client.post('/api/reports/upload/', {'file': f}, format='multipart')
 
@@ -33,17 +46,12 @@ class ReportUploadPdfTests(TestCase):
         self.assertEqual(index_names, {'RSI', 'ALSI'})
 
     def test_bond_market_overview_is_populated(self):
-        """Regression test: the bond turnover/deal narrative wraps across a PDF
-        line break ("worth of\nbonds traded in 5 deals"), which previously made
-        the regex fail silently and left these fields null.
-        """
         overview = self.response.json()['extracted_data']['market_overview']
         self.assertEqual(overview['bond_turnover'], 206685500)
         self.assertEqual(overview['bond_deals'], 5)
         self.assertEqual(overview['market_capitalization'], 6634919683716)
 
     def test_no_values_are_invented(self):
-        """Every parsed equity value must trace back to the source document."""
         data = self.response.json()['extracted_data']
         bok = next(e for e in data['equities'] if e['ticker'] == 'BOK')
         self.assertEqual(bok['closing'], 660)
@@ -51,8 +59,6 @@ class ReportUploadPdfTests(TestCase):
         self.assertEqual(bok['value'], 14256000)
 
     def test_market_overview_matches_source_narrative(self):
-        """Cross-check every market_overview figure against the source PDF's
-        "Market overview" bullets and TRADING STAT table (section 1 and 4)."""
         overview = self.response.json()['extracted_data']['market_overview']
         self.assertEqual(overview['equity_turnover'], 14307500)
         self.assertEqual(overview['shares_traded'], 21700)
@@ -62,10 +68,6 @@ class ReportUploadPdfTests(TestCase):
         self.assertEqual(overview['market_capitalization'], 6634919683716)
 
     def test_repo_market_activity_matches_source(self):
-        """The narrative repo bullet is split across an interleaved,
-        unrelated "Closing bell" sentence in the PDF's two-column layout —
-        ("...for a 7-day\ncounter, there were outstanding bids...\ntenor with
-        average rate of 8.750%..."). Both halves must still be recovered."""
         overview = self.response.json()['extracted_data']['market_overview']
         self.assertEqual(overview['repo_deals'], 3)
         self.assertEqual(overview['repo_turnover'], 10_000_000_000)
@@ -80,7 +82,6 @@ class ReportUploadPdfTests(TestCase):
         self.assertEqual(indices['ALSI']['previous'], 259.21)
 
     def test_all_equities_match_source(self):
-        """Every equity's closing/volume/value against "3. Equities Market" (page 2)."""
         expected = {
             'BOK': (660, 21600, 14256000),
             'BLR': (515, 100, 51500),
@@ -101,9 +102,6 @@ class ReportUploadPdfTests(TestCase):
             self.assertEqual(equities[ticker]['value'], value, ticker)
 
     def test_exchange_rates_match_source(self):
-        """Every currency's sell/buy/average against the source table (page 2).
-        The PDF's own header reads "Currency Sell Buy Average" — sell maps to
-        our `selling`, buy maps to our `buying`."""
         expected = {
             'USD': (1466.39, 1476.39, 1471.39),
             'KES': (11.32, 11.40, 11.36),
@@ -120,8 +118,6 @@ class ReportUploadPdfTests(TestCase):
             self.assertEqual(rates[currency]['average'], average, currency)
 
     def test_bond_trades_match_source(self):
-        """The 5 bonds with nonzero "Bond traded" volume in the gov/corp
-        listings (page 3-4), matched by security label, previous and closing."""
         expected = {
             'FXD2/2020/15Yrs (Re-opened)': (52000000, 100.85, 100.8),
             'FXD3/2021/15Yrs (Re-opened)': (50000000, 102, 100.7),
@@ -174,8 +170,6 @@ class ReportUploadPdfTests(TestCase):
         )
 
     def test_downloaded_workbook_matches_dashboard_data(self):
-        import openpyxl
-
         report_id = self.response.json()['id']
         api_data = self.response.json()['extracted_data']
 
@@ -207,7 +201,7 @@ class ReportUploadPdfTests(TestCase):
         self.assertEqual(rate_rows['USD'][1:3], (1466.39, 1476.39))
 
 
-class ReportUploadExcelTests(TestCase):
+class ReportUploadExcelTests(AuthenticatedTestCase):
     def test_upload_excel_succeeds(self):
         with open(SAMPLE_XLSX, 'rb') as f:
             response = self.client.post('/api/reports/upload/', {'file': f}, format='multipart')
@@ -218,12 +212,30 @@ class ReportUploadExcelTests(TestCase):
         self.assertEqual(len(data['bond_trades']), 5)
 
 
-class ReportUploadValidationTests(TestCase):
+class ReportUploadValidationTests(AuthenticatedTestCase):
     def test_rejects_unsupported_file_type(self):
-        fake_file = io.BytesIO(b'not a report')
-        fake_file.name = 'notes.txt'
+        fake_file = io.BytesIO(b'binary content')
+        fake_file.name = 'notes.zip'
         response = self.client.post('/api/reports/upload/', {'file': fake_file}, format='multipart')
         self.assertEqual(response.status_code, 400)
+
+    def test_prose_only_txt_still_succeeds_with_a_document_overview(self):
+        fake_file = io.BytesIO(b'This is just a paragraph of prose with no table or delimited data in it at all.')
+        fake_file.name = 'notes.txt'
+        response = self.client.post('/api/reports/upload/', {'file': fake_file}, format='multipart')
+        self.assertEqual(response.status_code, 201)
+        data = response.json()
+        self.assertEqual(data['status'], Report.Status.COMPLETED)
+        document = data['extracted_data']
+        self.assertEqual(document['datasets'], [])
+        self.assertTrue(any('paragraph of prose' in s['content'] for s in document['sections']))
+
+    def test_genuinely_empty_document_fails_clearly(self):
+        fake_file = io.BytesIO(b'   \n\n   ')
+        fake_file.name = 'blank.txt'
+        response = self.client.post('/api/reports/upload/', {'file': fake_file}, format='multipart')
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()['status'], Report.Status.FAILED)
 
     def test_rejects_missing_file(self):
         response = self.client.post('/api/reports/upload/', {}, format='multipart')
@@ -238,10 +250,43 @@ class ReportUploadValidationTests(TestCase):
         self.assertTrue(response.json()['error_message'])
 
 
-class ReportDetailTests(TestCase):
+class ReportDetailTests(AuthenticatedTestCase):
     def test_missing_report_returns_404(self):
         response = self.client.get('/api/reports/00000000-0000-0000-0000-000000000000/')
         self.assertEqual(response.status_code, 404)
+
+
+class ReportAuthAndOwnershipTests(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(username='owner@example.com', email='owner@example.com', password='owner-pass-123')
+        self.other = User.objects.create_user(username='other@example.com', email='other@example.com', password='other-pass-123')
+
+    def test_upload_requires_authentication(self):
+        with open(SAMPLE_PDF, 'rb') as f:
+            response = self.client.post('/api/reports/upload/', {'file': f}, format='multipart')
+        self.assertEqual(response.status_code, 403)
+
+    def test_list_requires_authentication(self):
+        self.assertEqual(self.client.get('/api/reports/').status_code, 403)
+
+    def test_uploaded_report_is_scoped_to_its_owner(self):
+        self.client.login(username='owner@example.com', password='owner-pass-123')
+        with open(SAMPLE_PDF, 'rb') as f:
+            upload = self.client.post('/api/reports/upload/', {'file': f}, format='multipart')
+        report_id = upload.json()['id']
+
+        listing = self.client.get('/api/reports/')
+        self.assertEqual(listing.status_code, 200)
+        self.assertEqual([r['id'] for r in listing.json()['results']], [report_id])
+        self.assertEqual(self.client.get(f'/api/reports/{report_id}/').status_code, 200)
+
+        self.client.logout()
+        self.client.login(username='other@example.com', password='other-pass-123')
+        self.assertEqual(self.client.get('/api/reports/').json()['results'], [])
+        self.assertEqual(self.client.get(f'/api/reports/{report_id}/').status_code, 404)
+        self.assertEqual(self.client.get(f'/api/reports/{report_id}/download/').status_code, 404)
+        self.assertEqual(self.client.patch(f'/api/reports/{report_id}/', {'original_filename': 'x.pdf'}, content_type='application/json').status_code, 404)
+        self.assertEqual(self.client.delete(f'/api/reports/{report_id}/').status_code, 404)
 
 
 def _bond(isin, security, maturity, coupon, closing=100.0):

@@ -1,7 +1,12 @@
 import axios, { type AxiosProgressEvent } from 'axios';
 
 import { apiClient } from './client';
-import type { Report } from '../types/report';
+import type {
+  AdminReportSummary,
+  Report,
+  ReportListParams,
+  ReportListResponse,
+} from '../types/report';
 
 export async function uploadReport(
   file: File,
@@ -33,6 +38,32 @@ export async function uploadReport(
 
 export async function getReport(id: string): Promise<Report> {
   const response = await apiClient.get<Report>(`/api/reports/${id}/`);
+  return response.data;
+}
+
+export async function renameReport(id: string, filename: string): Promise<Report> {
+  const response = await apiClient.patch<Report>(`/api/reports/${id}/`, { original_filename: filename });
+  return response.data;
+}
+
+export async function deleteReport(id: string): Promise<void> {
+  await apiClient.delete(`/api/reports/${id}/`);
+}
+
+export async function bulkDeleteReports(ids: string[]): Promise<{ deleted: string[] }> {
+  const response = await apiClient.post<{ deleted: string[] }>('/api/reports/bulk-delete/', { ids });
+  return response.data;
+}
+
+export async function listReports(params: ReportListParams = {}): Promise<ReportListResponse> {
+  const response = await apiClient.get<ReportListResponse>('/api/reports/', { params });
+  return response.data;
+}
+
+export async function listAllReportsAdmin(
+  params: ReportListParams & { owner?: string } = {},
+): Promise<ReportListResponse<AdminReportSummary>> {
+  const response = await apiClient.get<ReportListResponse<AdminReportSummary>>('/api/reports/admin/', { params });
   return response.data;
 }
 

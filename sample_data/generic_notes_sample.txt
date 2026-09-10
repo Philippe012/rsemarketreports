@@ -1,0 +1,17 @@
+Monthly Fuel Consumption Log
+
+This log tracks fuel consumption across the vehicle fleet for March 2026.
+Costs are recorded in USD per the finance team's standard reporting format.
+
+Vehicle,Distance (km),Fuel (L),Cost (USD)
+Truck-01,1240,310,465.00
+Truck-02,980,265,397.50
+Van-03,540,95,142.50
+Van-04,610,102,153.00
+Truck-05,1490,375,562.50
+
+Notes
+
+Truck-01 required an unscheduled service mid-month, which is reflected in
+slightly higher fuel usage per kilometer than usual. All other vehicles
+performed within their expected efficiency range for the month.

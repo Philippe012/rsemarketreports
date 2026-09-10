@@ -23,7 +23,6 @@ export function formatCompactCurrency(value: number | null | undefined, currency
   return formatCurrency(value, currency);
 }
 
-/** Compact form for large plain counts (volumes, share counts) — "52,000,000" -> "52M". */
 export function formatCompactNumber(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) return PLACEHOLDER;
   const abs = Math.abs(value);

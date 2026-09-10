@@ -1,11 +1,11 @@
-import { FileSpreadsheet, FileText, UploadCloud } from 'lucide-react';
+import { FileSpreadsheet, FileText, FileType, Table, UploadCloud } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 
 import { ErrorMessage } from '../common/ErrorMessage';
 import { Spinner } from '../common/Spinner';
 import type { UploadStatus } from '../../hooks/useReportUpload';
 
-const ACCEPTED_EXTENSIONS = ['.pdf', '.xlsx', '.xls', '.xlsm'];
+const ACCEPTED_EXTENSIONS = ['.pdf', '.xlsx', '.xls', '.xlsm', '.docx', '.csv', '.txt'];
 
 interface UploadZoneProps {
   status: UploadStatus;
@@ -31,7 +31,7 @@ export function UploadZone({ status, progress, fileName, errorMessage, onFileSel
       const file = files?.[0];
       if (!file) return;
       if (!isAcceptedFile(file)) {
-        setLocalError('Unsupported file type. Please upload a PDF or Excel (.xlsx) RSE report.');
+        setLocalError('Unsupported file type. Please upload a PDF, Excel, Word (.docx), CSV or TXT document.');
         return;
       }
       setLocalError(null);
@@ -125,18 +125,27 @@ export function UploadZone({ status, progress, fileName, errorMessage, onFileSel
             </div>
             <div>
               <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>
-                Drag & drop your RSE report, or click to browse
+                Drag & drop your document, or click to browse
               </p>
               <p className="mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                Supports PDF and Excel (.xlsx) market reports
+                Reports, spreadsheets and datasets — RSE market reports get a specialized dashboard
               </p>
             </div>
-            <div className="flex items-center gap-4 pt-1 text-xs" style={{ color: 'var(--text-muted)' }}>
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-1 text-xs" style={{ color: 'var(--text-muted)' }}>
               <span className="inline-flex items-center gap-1.5">
                 <FileText size={14} /> PDF
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <FileSpreadsheet size={14} /> Excel
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <FileType size={14} /> Word
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Table size={14} /> CSV
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <FileText size={14} /> TXT
               </span>
             </div>
           </>

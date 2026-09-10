@@ -17,8 +17,26 @@ EMPTY_MARKET_OVERVIEW = {
 }
 
 
+RSE_EXCEL_SHEET_SIGNALS = {'STOCK', 'MARKET STATS', 'BONDS', 'BONDS TRADES', 'EXCHANGE RATE'}
+
+
+def is_rse_report(source_type: str, extraction) -> bool:
+    """Cheap, deterministic check for whether a document is an RSE market
+    report — used by services.pipeline to route PDFs/Excel workbooks to this
+    specialized parser instead of the generic document-intelligence engine
+    (services.documents). CSVs never route here; RSE never ships as CSV.
+    """
+    if source_type == 'pdf':
+        return 'RWANDA STOCK EXCHANGE' in extraction.full_text.upper()
+    if source_type == 'excel':
+        sheet_names = {name.strip().upper() for name in extraction.sheets.keys()}
+        return len(sheet_names & RSE_EXCEL_SHEET_SIGNALS) >= 2
+    return False
+
+
 def _empty_schema(source_type: str) -> dict:
     return {
+        'kind': 'rse_market_report',
         'report_title': None,
         'report_date': None,
         'source_type': source_type,

@@ -38,8 +38,15 @@ def parse_number(value) -> Optional[float]:
     text = text.replace('\xa0', ' ').strip()
     text = text.replace('%', '')
     text = re.sub(r'(?i)\b(frw|rwf|usd)\b', '', text).strip()
+    # Strip common currency symbols too — needed for generic (non-RSE) documents,
+    # which may use "$", "€", "£" rather than an RWF-style currency code. RSE
+    # values never contain these, so this is a pure superset for that path.
+    text = re.sub(r'[$€£¥]', '', text).strip()
     text = text.replace(',', '')
     text = text.replace('+', '')
+    # Accounting-style negatives: "(1,234.50)" -> -1234.50
+    if text.startswith('(') and text.endswith(')'):
+        text = '-' + text[1:-1]
 
     if not _NUMBER_RE.match(text):
         return None

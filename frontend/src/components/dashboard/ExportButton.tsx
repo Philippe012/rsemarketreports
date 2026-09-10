@@ -10,7 +10,7 @@ export function ExportButton({ reportId, variant = 'solid' }: { reportId: string
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
-      const response = await fetch(getDownloadUrl(reportId));
+      const response = await fetch(getDownloadUrl(reportId), { credentials: 'include' });
       if (!response.ok) throw new Error('Download failed');
       const blob = await response.blob();
       const disposition = response.headers.get('Content-Disposition') ?? '';
