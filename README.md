@@ -24,22 +24,22 @@ its own.
 
 No LLM is involved in producing any number you see. Everything traces back to a cell or line in
 your original document. If a model gets added later, its job would be suggesting what a column
-*means* — not generating the numbers.
+*means* not generating the numbers.
 
 ## Advanced Intelligence
 
 Every dashboard has an "Investigate Document" button that runs a deeper, still fully
-deterministic pass over the data — no invented numbers here either:
+deterministic pass over the data no invented numbers here either:
 
-- **Anomaly Radar** — outliers, sudden jumps, totals that don't match their own rows.
-- **Data Forensics** — a 0–100 data-quality score based on missing values, duplicates, bad dates.
-- **Discoveries** — plain-language "what matters most" insights.
-- **Explain This** — shows the exact source rows behind any number on screen.
-- **Entity graph & geographic view** — relationships and locations, built only from your data.
-- **Time Machine** — compares two of your own reports side by side.
-- **What-If Simulator** — lets you project scenarios, clearly labeled as assumptions, never
+- **Anomaly Radar** outliers, sudden jumps, totals that don't match their own rows.
+- **Data Forensics** a 0–100 data-quality score based on missing values, duplicates, bad dates.
+- **Discoveries** plain-language "what matters most" insights.
+- **Explain This** shows the exact source rows behind any number on screen.
+- **Entity graph & geographic view** relationships and locations, built only from your data.
+- **Time Machine** compares two of your own reports side by side.
+- **What-If Simulator** lets you project scenarios, clearly labeled as assumptions, never
   mixed in with real data.
-- **AI Analyst** — a chat that answers questions about your document using the modules above.
+- **AI Analyst** a chat that answers questions about your document using the modules above.
 
 ## Tech stack
 
@@ -83,11 +83,11 @@ suite that checks every figure in the RSE dashboard against the real sample repo
 
 ## Current limitations
 
-- No login or document history yet — it's a single upload → dashboard flow, fine for local use,
+- No login or document history yet it's a single upload → dashboard flow, fine for local use,
   not for sharing with a team.
-- No natural-language search over your data yet — you filter and sort the tables directly.
-- Scanned/image-only PDFs aren't supported (no OCR) — the PDF needs a real text layer.
-- Schema inference is heuristic — an unusually named or irregular column may get flagged as
+- No natural-language search over your data yet you filter and sort the tables directly.
+- Scanned/image-only PDFs aren't supported (no OCR) the PDF needs a real text layer.
+- Schema inference is heuristic an unusually named or irregular column may get flagged as
   low-confidence rather than confidently (and wrongly) labeled.
 
 ## What's next
@@ -95,5 +95,5 @@ suite that checks every figure in the RSE dashboard against the real sample repo
 1. Accounts and a saved-documents list.
 2. A landing page in front of the upload flow.
 3. An optional LLM layer for *interpreting* already-extracted data (summaries, better column
-   naming, natural-language queries) — never for producing the numbers themselves.
+   naming, natural-language queries) never for producing the numbers themselves.
 4. OCR support for scanned PDFs.
