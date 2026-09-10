@@ -6,7 +6,7 @@ import { Spinner } from '../common/Spinner';
 import type { ChatMessage } from '../../types/chat';
 
 const CONFIDENCE_NOTE: Record<string, string | null> = {
-  low: null, // the answer text itself already says "couldn't find" — no extra note needed
+  low: null, 
   medium: 'Best match found in this document — double-check against the source.',
   high: null,
 };
@@ -74,12 +74,6 @@ function TypingIndicator() {
   );
 }
 
-/** "Ask this document" — a document-scoped chat panel embedded in every
- * dashboard (RSE and generic alike). Answers come entirely from this
- * document's own extracted data via the backend's deterministic answer
- * engine (services.chat) — see that package for how matching and source
- * citation work. A floating launcher on every screen size; the panel
- * itself is a fixed side panel on desktop and a bottom sheet on mobile. */
 export function DocumentChat({ reportId, documentTitle }: { reportId: string; documentTitle: string }) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');

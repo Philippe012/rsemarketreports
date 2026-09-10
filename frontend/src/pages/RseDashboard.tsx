@@ -1,4 +1,4 @@
-import { Building2, ScrollText } from 'lucide-react';
+import { BrainCircuit, Building2, ScrollText } from 'lucide-react';
 
 import { BondsTable } from '../components/dashboard/BondsTable';
 import { BondTradesTable } from '../components/dashboard/BondTradesTable';
@@ -12,6 +12,7 @@ import { MarketOverviewSection } from '../components/dashboard/MarketOverviewSec
 import { SessionActivityStrip } from '../components/dashboard/SessionActivityStrip';
 import { TradingStatsSection } from '../components/dashboard/TradingStatsSection';
 import { InsightsList } from '../components/common/InsightsList';
+import { IntelligencePanel } from '../components/intelligence/IntelligencePanel';
 import type { RseReport } from '../types/report';
 import { formatDate } from '../utils/formatters';
 
@@ -63,6 +64,18 @@ export function RseDashboard({ report }: { report: RseReport }) {
       <BondTradesTable trades={data.bond_trades} />
 
       <ExchangeRateTable rates={data.exchange_rates} />
+
+      <div>
+        <div className="mb-3">
+          <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
+            <BrainCircuit size={16} /> Advanced Intelligence
+          </h2>
+          <p className="mt-0.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+            Deterministic analysis on top of the extracted market data — nothing here invents a number.
+          </p>
+        </div>
+        <IntelligencePanel reportId={report.id} />
+      </div>
 
       <div
         className="flex flex-col items-center gap-3 rounded-lg border px-6 py-8 text-center animate-fade-in sm:flex-row sm:justify-between sm:text-left"

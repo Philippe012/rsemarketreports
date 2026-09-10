@@ -1,10 +1,3 @@
-"""CSV extraction. Returns raw rows (list of lists) exactly like
-excel_extractor's single-sheet output — deliberately the same shape so the
-generic document parser can treat a CSV file as "a workbook with one sheet"
-without any special-casing.
-"""
-from __future__ import annotations
-
 import csv
 import io
 from dataclasses import dataclass, field

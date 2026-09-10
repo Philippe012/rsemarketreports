@@ -59,6 +59,34 @@ class Report(models.Model):
         return f"{self.original_filename} ({self.status})"
 
 
+class AlertRule(models.Model):
+    """A user-defined Intelligent Alert threshold on one report. Only the
+    rule itself is persisted — whether it's currently triggered is always
+    recomputed live from the report's current extracted_data (see
+    services.intelligence.alerts), so a stored alert can never go stale.
+    """
+
+    class Operator(models.TextChoices):
+        GREATER_THAN = 'gt', 'Greater than'
+        GREATER_OR_EQUAL = 'gte', 'Greater than or equal to'
+        LESS_THAN = 'lt', 'Less than'
+        LESS_OR_EQUAL = 'lte', 'Less than or equal to'
+
+    report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name='alert_rules')
+    metric_label = models.CharField(max_length=200)
+    dataset = models.CharField(max_length=200)
+    column = models.CharField(max_length=200)
+    operator = models.CharField(max_length=4, choices=Operator.choices)
+    threshold = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.metric_label} {self.operator} {self.threshold}'
+
+
 class ChatMessage(models.Model):
 
     class Role(models.TextChoices):

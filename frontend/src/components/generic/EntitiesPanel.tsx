@@ -23,9 +23,6 @@ function ChipGroup({ label, values }: { label: string; values: string[] }) {
   );
 }
 
-/** For a document with no table at all — the numbers, dates, and repeated
- * terms found in its prose, lifted verbatim from the text (never inferred
- * or summarized), so there is still something concrete to show. */
 export function EntitiesPanel({ entities }: { entities: DocumentEntities }) {
   const hasAny = entities.numbers.length > 0 || entities.dates.length > 0 || entities.keywords.length > 0;
 

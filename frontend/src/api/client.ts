@@ -16,9 +16,6 @@ function readCookie(name: string): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
-// Django's CSRF protection requires the token cookie's value echoed back as
-// a request header on any state-changing request. The cookie itself is set
-// by GET /api/auth/csrf/ (primed once on app boot — see AuthContext).
 apiClient.interceptors.request.use((config) => {
   const method = (config.method ?? 'get').toLowerCase();
   if (!SAFE_METHODS.has(method)) {
@@ -36,8 +33,6 @@ export function getApiErrorMessage(error: unknown): string {
     const body = error.response?.data as Record<string, unknown> | undefined;
     const detail = body?.detail;
     if (typeof detail === 'string') return detail;
-    // DRF serializer validation errors come back as {field: [messages]} —
-    // surface the first one rather than a generic "request failed".
     if (body && typeof body === 'object') {
       for (const value of Object.values(body)) {
         if (Array.isArray(value) && typeof value[0] === 'string') return value[0];

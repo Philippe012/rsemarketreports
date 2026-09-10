@@ -1,4 +1,4 @@
-import { Table2 } from 'lucide-react';
+import { BrainCircuit, Table2 } from 'lucide-react';
 import { useRef } from 'react';
 
 import { Card } from '../components/common/Card';
@@ -11,6 +11,7 @@ import { EntitiesPanel } from '../components/generic/EntitiesPanel';
 import { FiguresGrid } from '../components/generic/FiguresGrid';
 import { MetricsGrid } from '../components/generic/MetricsGrid';
 import { SectionsList } from '../components/generic/SectionsList';
+import { IntelligencePanel } from '../components/intelligence/IntelligencePanel';
 import type { GenericReport } from '../types/report';
 
 const LOW_CONFIDENCE_NOTE: Record<string, string | null> = {
@@ -41,6 +42,7 @@ export function GenericDashboard({ report }: { report: GenericReport }) {
     { id: 'datasets', label: 'Datasets', show: hasDatasets },
     { id: 'figures', label: 'Figures', show: document.figures.length > 0 },
     { id: 'source', label: 'Source', show: document.sections.length > 0 },
+    { id: 'intelligence', label: 'Intelligence', show: true },
   ].filter((item) => item.show);
 
   return (
@@ -140,6 +142,23 @@ export function GenericDashboard({ report }: { report: GenericReport }) {
           <SectionsList sections={document.sections} />
         </div>
       )}
+
+      <div ref={(el) => { sectionRefs.current.intelligence = el; }}>
+        <div className="mb-3">
+          <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
+            <BrainCircuit size={16} /> Advanced Intelligence
+          </h2>
+          <p className="mt-0.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+            Deterministic analysis on top of the extracted data — nothing here invents a number.
+          </p>
+        </div>
+        <IntelligencePanel
+          reportId={report.id}
+          metrics={document.metrics}
+          charts={document.charts}
+          datasets={document.datasets}
+        />
+      </div>
 
       <div
         className="flex flex-col items-center gap-3 rounded-lg border px-6 py-8 text-center animate-fade-in sm:flex-row sm:justify-between sm:text-left"

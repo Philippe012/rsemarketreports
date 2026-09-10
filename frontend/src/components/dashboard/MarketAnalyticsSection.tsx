@@ -20,10 +20,6 @@ function ChangeTooltip({ active, payload, label }: { active?: boolean; payload?:
   );
 }
 
-/** A single-session (no fabricated history) market analytics view built
- * only from what this report actually contains: which equities moved the
- * most today, and which traded the most volume. Renders nothing for a
- * chart that has no underlying data rather than showing an empty frame. */
 export function MarketAnalyticsSection({ equities }: { equities: Equity[] }) {
   const { theme } = useTheme();
   const colors = CHART_COLORS[theme];

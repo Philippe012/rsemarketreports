@@ -6,13 +6,7 @@ import { ExportButton } from './ExportButton';
 import { WarningsPanel } from './WarningsPanel';
 import type { SourceType } from '../../types/report';
 
-/** The single header used by both the RSE and generic-document dashboards.
- * Shows each fact about the current document exactly once: an optional
- * eyebrow/category, the title, one metadata line (date · source · status),
- * the download action, and an optional subtle secondary line (e.g. the
- * original filename or a one-line dataset summary) — never repeated across
- * a breadcrumb, heading and metadata block the way the old per-dashboard
- * headers did. */
+
 export function DocumentHeader({
   eyebrow,
   title,

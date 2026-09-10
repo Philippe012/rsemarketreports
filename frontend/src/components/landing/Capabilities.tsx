@@ -6,7 +6,7 @@ const CAPABILITIES = [
   {
     icon: FileCheck2,
     title: 'Structured extraction',
-    description: 'Tables, columns and figures are recovered with their types inferred — currency, percentage, date, identifier and more.',
+    description: 'Tables, columns and figures are recovered with their types inferred currency, percentage, date, identifier and more.',
   },
   {
     icon: AlertTriangle,

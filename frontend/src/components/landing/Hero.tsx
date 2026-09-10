@@ -25,8 +25,7 @@ export function Hero() {
           </h1>
           <p className="mt-5 max-w-xl text-[16px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             Upload a PDF, Excel, Word, CSV or TXT file. Datapoint extracts the text and tables,
-            validates the numbers, and builds KPIs, charts and an organized Excel export —
-            automatically, with nothing invented. Rwanda Stock Exchange market reports get a
+            validates the numbers, and builds KPIs, charts and an organized Excel export automatically, with nothing invented. Rwanda Stock Exchange market reports get a
             specialized dashboard; every other document gets a general-purpose one.
           </p>
 

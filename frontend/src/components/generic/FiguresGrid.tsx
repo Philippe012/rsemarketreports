@@ -3,9 +3,6 @@ import { ImageIcon } from 'lucide-react';
 import type { DocumentFigure } from '../../types/report';
 import { Card } from '../common/Card';
 
-/** Embedded images found in the document. Shown as-is with their source
- * location — the platform never tries to read chart values out of an image,
- * so no data claims are attached to a figure, only what it literally is. */
 export function FiguresGrid({ figures }: { figures: DocumentFigure[] }) {
   if (figures.length === 0) return null;
 

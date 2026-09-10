@@ -7,8 +7,6 @@ import type {
   User,
 } from '../types/auth';
 
-/** Primes the `csrftoken` cookie. Must resolve before the first POST
- * (signup/login/etc.) — called once on app boot by AuthProvider. */
 export async function primeCsrf(): Promise<void> {
   await apiClient.get('/api/auth/csrf/');
 }
@@ -27,8 +25,6 @@ export async function logout(): Promise<void> {
   await apiClient.post('/api/auth/logout/');
 }
 
-/** Resolves the current session's user, or null if not authenticated.
- * Never throws for the expected "not logged in" case (403). */
 export async function getMe(): Promise<User | null> {
   try {
     const response = await apiClient.get<User>('/api/auth/me/');

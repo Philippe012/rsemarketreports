@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .list_filters import document_type_of
-from .models import ChatMessage, Report
+from .models import AlertRule, ChatMessage, Report
 
 
 class ReportSerializer(serializers.ModelSerializer):
@@ -59,6 +59,31 @@ class ReportUpdateSerializer(serializers.ModelSerializer):
         value = value.strip()
         if not value:
             raise serializers.ValidationError('Filename cannot be empty.')
+        return value
+
+
+class AlertRuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlertRule
+        fields = ['id', 'metric_label', 'dataset', 'column', 'operator', 'threshold', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+    def validate_metric_label(self, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError('Give this alert a label.')
+        return value
+
+    def validate_dataset(self, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError('A dataset is required.')
+        return value
+
+    def validate_column(self, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError('A column is required.')
         return value
 
 

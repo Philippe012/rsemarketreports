@@ -7,12 +7,14 @@ every value is read straight from the already-validated extraction.
 """
 from __future__ import annotations
 
-from typing import List
+from typing import List, Optional
 
 from .base import AnswerEngine, AnswerResult, Source, not_found
 from .fact_index import FactIndex
 from .formatting import currency, num, percent
 from .text_match import tokenize
+
+_COMPARE_TRIGGERS = ('compare', ' vs ', ' vs. ', ' versus ')
 
 
 def _words(*parts) -> set:
@@ -27,6 +29,7 @@ class RseAnswerEngine(AnswerEngine):
     def __init__(self, data: dict):
         self._data = data
         self._index = FactIndex()
+        self._comparables: dict = {}
         self._build()
 
     # -- index construction -------------------------------------------------
@@ -40,6 +43,62 @@ class RseAnswerEngine(AnswerEngine):
         self._build_bonds(self._data.get('corporate_bonds') or [], 'Corporate bonds')
         self._build_bond_trades()
         self._build_exchange_rates()
+        self._build_intelligence()
+
+    def _build_intelligence(self) -> None:
+        """Extends the AI Analyst with the Advanced Intelligence layer —
+        see services.chat.generic_engine._build_intelligence for the
+        matching generic-document version of this."""
+        from services.intelligence.adapter import to_analysis_datasets
+        from services.intelligence.anomalies import detect_anomalies
+        from services.intelligence.forensics import compute_forensics
+        from services.intelligence.ranking import what_matters_most
+
+        datasets = to_analysis_datasets(self._data)
+        forensics = compute_forensics(datasets)
+        anomalies = detect_anomalies(datasets)
+        ranked = what_matters_most(self._data.get('insights') or [], anomalies, forensics)
+
+        if ranked:
+            summary = ' '.join(f'({i + 1}) {f["text"]}' for i, f in enumerate(ranked[:5]))
+            self._index.add(
+                ['matters', 'most', 'important', 'priority'],
+                f'What matters most in this report: {summary}',
+                Source('What matters most'),
+            )
+
+        if anomalies:
+            summary = ' '.join(a['message'] for a in anomalies[:5])
+            self._index.add(
+                ['unusual', 'anomaly', 'anomalies', 'outlier', 'outliers', 'strange', 'odd', 'suspicious'],
+                f'Unusual values detected: {summary}',
+                Source('Anomaly radar'),
+            )
+        else:
+            self._index.add(
+                ['unusual', 'anomaly', 'anomalies', 'outlier', 'outliers', 'strange', 'odd', 'suspicious'],
+                "No statistical anomalies were detected in this report's numeric data.",
+                Source('Anomaly radar'),
+            )
+
+        self._index.add(
+            ['quality', 'clean', 'reliable', 'trustworthy'],
+            (
+                f"Data quality score: {forensics['quality_score']}/100, based on "
+                f"{forensics['missing_cells']} missing value(s) and {forensics['duplicate_rows']} "
+                f"duplicate row(s) out of {forensics['total_rows']} record(s)."
+            ),
+            Source('Data forensics'),
+        )
+
+    def _try_compare(self, question: str) -> Optional[AnswerResult]:
+        lowered = question.lower()
+        if not any(trigger in lowered for trigger in _COMPARE_TRIGGERS):
+            return None
+        matches = [summary for key, summary in self._comparables.items() if key in lowered]
+        if len(matches) < 2:
+            return None
+        return AnswerResult(answer=' '.join(matches[:4]), sources=[Source('Comparison')], confidence='medium')
 
     def _build_overview(self) -> None:
         o = self._data.get('market_overview') or {}
@@ -87,12 +146,13 @@ class RseAnswerEngine(AnswerEngine):
                 f"({percent(idx.get('percent_change'))}) today.",
                 src,
             )
-            self._index.add(
-                name_words,
+            summary = (
                 f"{name} index — closing {num(idx.get('closing'), 2)}, previous {num(idx.get('previous'), 2)}, "
-                f"change {num(idx.get('points_change'), 2)} points ({percent(idx.get('percent_change'))}).",
-                src,
+                f"change {num(idx.get('points_change'), 2)} points ({percent(idx.get('percent_change'))})."
             )
+            self._index.add(name_words, summary, src)
+            if name:
+                self._comparables[name.strip().lower()] = summary
 
     def _build_trading_stats(self) -> None:
         for stat in self._data.get('trading_stats') or []:
@@ -137,10 +197,13 @@ class RseAnswerEngine(AnswerEngine):
                              f"The value traded for {ticker} today was {currency(eq.get('value'))}.", src)
             self._index.add(entity_words | {'12m', 'high', 'yearly', 'annual', 'year'},
                              f"{ticker}'s 12-month high is {num(eq.get('high_12m'))} and 12-month low is {num(eq.get('low_12m'))}.", src)
-            self._index.add(entity_words,
-                             f"{ticker} — closing {num(eq.get('closing'))}, previous {num(eq.get('previous'))}, "
-                             f"change {num(eq.get('change'))}, volume {num(eq.get('volume'))}, value {currency(eq.get('value'))}.",
-                             src)
+            summary = (
+                f"{ticker} — closing {num(eq.get('closing'))}, previous {num(eq.get('previous'))}, "
+                f"change {num(eq.get('change'))}, volume {num(eq.get('volume'))}, value {currency(eq.get('value'))}."
+            )
+            self._index.add(entity_words, summary, src)
+            if ticker:
+                self._comparables[ticker.lower()] = summary
 
     def _build_bonds(self, bonds: List[dict], category_label: str) -> None:
         for bond in bonds:
@@ -159,10 +222,13 @@ class RseAnswerEngine(AnswerEngine):
                              f"{security}'s yield to maturity is {percent(bond.get('yield_tm'), signed=False)}.", src)
             self._index.add(entity_words | {'bids', 'offers'},
                              f"{security} had {num(bond.get('bids'))} bids and {num(bond.get('offers'))} offers.", src)
-            self._index.add(entity_words,
-                             f"{security} ({category_label.lower()}) — closing price {num(bond.get('closing_price'), 2)}, "
-                             f"coupon {percent(bond.get('coupon_rate'), signed=False)}, maturity {bond.get('maturity_date') or 'not available'}.",
-                             src)
+            summary = (
+                f"{security} ({category_label.lower()}) — closing price {num(bond.get('closing_price'), 2)}, "
+                f"coupon {percent(bond.get('coupon_rate'), signed=False)}, maturity {bond.get('maturity_date') or 'not available'}."
+            )
+            self._index.add(entity_words, summary, src)
+            if security:
+                self._comparables[security.strip().lower()] = summary
 
     def _build_bond_trades(self) -> None:
         for trade in self._data.get('bond_trades') or []:
@@ -197,13 +263,20 @@ class RseAnswerEngine(AnswerEngine):
                              f"The {currency_code} selling rate is {num(rate.get('selling'), 2)}.", src)
             self._index.add(entity_words | {'average', 'mid', 'rate', 'exchange'},
                              f"The average {currency_code} exchange rate is {num(rate.get('average'), 2)}.", src)
-            self._index.add(entity_words,
-                             f"{currency_code} — buying {num(rate.get('buying'), 2)}, selling {num(rate.get('selling'), 2)}, "
-                             f"average {num(rate.get('average'), 2)}.", src)
+            summary = (
+                f"{currency_code} — buying {num(rate.get('buying'), 2)}, selling {num(rate.get('selling'), 2)}, "
+                f"average {num(rate.get('average'), 2)}."
+            )
+            self._index.add(entity_words, summary, src)
+            if currency_code:
+                self._comparables[currency_code.strip().lower()] = summary
 
     # -- public interface -----------------------------------------------------
 
     def answer(self, question: str) -> AnswerResult:
+        comparison = self._try_compare(question)
+        if comparison is not None:
+            return comparison
         fact = self._index.best_match(question)
         if fact is None:
             return not_found()
@@ -234,5 +307,7 @@ class RseAnswerEngine(AnswerEngine):
             questions.append('Which bonds traded today?')
         elif gov_bonds or corp_bonds:
             questions.append(f"How many bonds are listed ({len(gov_bonds) + len(corp_bonds)} total)?")
+        questions.append('What matters most in this report?')
+        questions.append('What looks unusual?')
 
         return questions[:6]

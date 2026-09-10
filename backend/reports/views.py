@@ -15,12 +15,18 @@ from services.extraction.docx_extractor import DocxExtractionError
 from services.extraction.excel_extractor import ExcelExtractionError
 from services.extraction.pdf_extractor import PdfExtractionError
 from services.extraction.txt_extractor import TxtExtractionError
+from services.intelligence.adapter import to_analysis_datasets
+from services.intelligence.bundle import build_analysis
+from services.intelligence.dashboard_builder import suggest_visualization
+from services.intelligence.explain import explain_chart, explain_metric
+from services.intelligence.timeline import compare_reports
 from services.normalization.validate_data import ReportValidationError
 from services.pipeline import UnsupportedFileType, detect_source_type, export_report_excel, process_report_file
 
 from .list_filters import apply_filters, apply_sort, available_facets, paginate
-from .models import ChatMessage, Report
+from .models import AlertRule, ChatMessage, Report
 from .serializers import (
+    AlertRuleSerializer,
     ChatMessageSerializer,
     ReportAdminListSerializer,
     ReportListSerializer,
@@ -255,3 +261,127 @@ class ReportChatView(APIView):
             'user_message': ChatMessageSerializer(user_message).data,
             'assistant_message': ChatMessageSerializer(assistant_message).data,
         }, status=status.HTTP_201_CREATED)
+
+
+class ReportAnalysisView(APIView):
+    """Advanced Intelligence bundle: Investigate, Anomaly Radar, Data
+    Forensics, Discoveries/What Matters Most, the Entity Relationship
+    Graph, Geographic Intelligence, Document Vision, Intelligent Alerts,
+    and (RSE only) the Trading/Market view — computed fresh on every
+    request from the current extracted_data. See services.intelligence.
+    """
+
+    def get(self, request, pk):
+        try:
+            report = Report.objects.get(pk=pk, user=request.user)
+        except Report.DoesNotExist:
+            return Response({'detail': 'Report not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if report.status != Report.Status.COMPLETED or not report.extracted_data:
+            return Response({'detail': 'This document has not finished processing yet.'},
+                             status=status.HTTP_409_CONFLICT)
+
+        rules = AlertRuleSerializer(report.alert_rules.all(), many=True).data
+        analysis = build_analysis(report.extracted_data, alert_rules=rules)
+        return Response(analysis)
+
+
+class ReportExplainView(APIView):
+    """Explain This: the literal calculation and source rows behind one
+    metric or chart already shown on the dashboard."""
+
+    def post(self, request, pk):
+        try:
+            report = Report.objects.get(pk=pk, user=request.user)
+        except Report.DoesNotExist:
+            return Response({'detail': 'Report not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if report.status != Report.Status.COMPLETED or not report.extracted_data:
+            return Response({'detail': 'This document has not finished processing yet.'},
+                             status=status.HTTP_409_CONFLICT)
+
+        datasets = to_analysis_datasets(report.extracted_data)
+        chart = request.data.get('chart')
+        if chart:
+            return Response(explain_chart(datasets, chart))
+
+        dataset_name = request.data.get('dataset')
+        column_name = request.data.get('column', '')
+        kind = request.data.get('kind', 'sum')
+        if not dataset_name:
+            return Response({'detail': 'A "dataset" (and optionally "column"/"kind") or "chart" is required.'},
+                             status=status.HTTP_400_BAD_REQUEST)
+        return Response(explain_metric(datasets, dataset_name, column_name, kind))
+
+
+class ReportDashboardBuilderView(APIView):
+    """AI Dashboard Builder: matches a free-text request against this
+    document's own datasets/columns and returns the closest matching
+    chart — never a fabricated one."""
+
+    def post(self, request, pk):
+        try:
+            report = Report.objects.get(pk=pk, user=request.user)
+        except Report.DoesNotExist:
+            return Response({'detail': 'Report not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if report.status != Report.Status.COMPLETED or not report.extracted_data:
+            return Response({'detail': 'This document has not finished processing yet.'},
+                             status=status.HTTP_409_CONFLICT)
+
+        query = (request.data.get('query') or '').strip()
+        if not query:
+            return Response({'detail': 'Please describe what you want to see.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        datasets = to_analysis_datasets(report.extracted_data)
+        return Response(suggest_visualization(datasets, query))
+
+
+class ReportCompareView(APIView):
+    """Time Machine: compares this report against another of the user's
+    own reports."""
+
+    def get(self, request, pk):
+        try:
+            base = Report.objects.get(pk=pk, user=request.user)
+            other = Report.objects.get(pk=request.query_params.get('with'), user=request.user)
+        except Report.DoesNotExist:
+            return Response({'detail': 'Report not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except (ValueError, TypeError):
+            return Response({'detail': 'Provide a valid "with" report id to compare against.'},
+                             status=status.HTTP_400_BAD_REQUEST)
+
+        for report in (base, other):
+            if report.status != Report.Status.COMPLETED or not report.extracted_data:
+                return Response({'detail': 'Both documents must have finished processing.'},
+                                 status=status.HTTP_409_CONFLICT)
+
+        return Response(compare_reports(base.extracted_data, other.extracted_data))
+
+
+class ReportAlertsView(APIView):
+    """Intelligent Alerts: threshold rules a user attaches to one report."""
+
+    def get(self, request, pk):
+        try:
+            report = Report.objects.get(pk=pk, user=request.user)
+        except Report.DoesNotExist:
+            return Response({'detail': 'Report not found.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(AlertRuleSerializer(report.alert_rules.all(), many=True).data)
+
+    def post(self, request, pk):
+        try:
+            report = Report.objects.get(pk=pk, user=request.user)
+        except Report.DoesNotExist:
+            return Response({'detail': 'Report not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = AlertRuleSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(report=report)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class ReportAlertDetailView(APIView):
+    def delete(self, request, pk, alert_id):
+        try:
+            rule = AlertRule.objects.get(pk=alert_id, report_id=pk, report__user=request.user)
+        except AlertRule.DoesNotExist:
+            return Response({'detail': 'Alert not found.'}, status=status.HTTP_404_NOT_FOUND)
+        rule.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

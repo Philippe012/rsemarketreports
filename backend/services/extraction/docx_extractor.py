@@ -1,14 +1,3 @@
-"""Word (.docx) extraction via python-docx.
-
-Walks the document body in its actual reading order (python-docx's own
-``document.paragraphs``/``document.tables`` are two separate flat lists that
-lose how text and tables interleave — reconstructing that order is the one
-piece of real work this module does), grouping paragraph text under the
-nearest preceding heading into sections, and returning each table as a plain
-2D list of cell strings in the same shape pdf_extractor/excel_extractor use.
-"""
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from typing import List
 

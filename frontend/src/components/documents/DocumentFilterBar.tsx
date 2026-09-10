@@ -38,10 +38,6 @@ function Select({ value, onChange, children, label }: { value: string; onChange:
   );
 }
 
-/** Search, filter and sort controls for the documents list — every option
- * (formats, years, document types present) comes from the backend's
- * `facets`, computed dynamically from whatever is actually uploaded rather
- * than a hardcoded RSE-only list. */
 export function DocumentFilterBar({
   params,
   onChange,

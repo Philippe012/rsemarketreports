@@ -2,9 +2,6 @@ import { TrendingUp } from 'lucide-react';
 
 import { Card } from '../common/Card';
 
-/** Plain-language observations computed directly from dataset statistics
- * (a range, a leader, a trend) — each one traceable to a real aggregate,
- * never a claim invented beyond what the numbers show. */
 export function InsightsList({ insights }: { insights: string[] }) {
   if (insights.length === 0) return null;
 

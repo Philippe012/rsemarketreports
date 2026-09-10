@@ -5,6 +5,8 @@ from .fact_index import FactIndex
 from .formatting import num, percent
 from .text_match import best_matching_text, tokenize
 
+_COMPARE_TRIGGERS = ('compare', ' vs ', ' vs. ', ' versus ')
+
 _AGGREGATE_WORDS = {
     'sum': ['total', 'sum'],
     'average': ['average', 'mean'],
@@ -39,6 +41,7 @@ class GenericAnswerEngine(AnswerEngine):
         self._data = data
         self._index = FactIndex()
         self._sections: List[dict] = data.get('sections') or []
+        self._comparables: dict = {}
         self._build()
 
     # -- index construction ---------------------------------------------------
@@ -49,6 +52,67 @@ class GenericAnswerEngine(AnswerEngine):
         self._build_metrics()
         self._build_insights()
         self._build_entities()
+        self._build_intelligence()
+
+    def _build_intelligence(self) -> None:
+        """Extends the AI Analyst with the Advanced Intelligence layer:
+        "what matters most", "what looks unusual", and data-quality
+        questions, all backed by services.intelligence rather than a
+        second copy of that logic."""
+        from services.intelligence.adapter import to_analysis_datasets
+        from services.intelligence.anomalies import detect_anomalies
+        from services.intelligence.forensics import compute_forensics
+        from services.intelligence.ranking import what_matters_most
+
+        datasets = to_analysis_datasets(self._data)
+        forensics = compute_forensics(datasets)
+        anomalies = detect_anomalies(datasets)
+        ranked = what_matters_most(self._data.get('insights') or [], anomalies, forensics)
+
+        if ranked:
+            summary = ' '.join(f'({i + 1}) {f["text"]}' for i, f in enumerate(ranked[:5]))
+            self._index.add(
+                ['matters', 'most', 'important', 'priority'],
+                f'What matters most in this document: {summary}',
+                Source('What matters most'),
+            )
+
+        if anomalies:
+            summary = ' '.join(a['message'] for a in anomalies[:5])
+            self._index.add(
+                ['unusual', 'anomaly', 'anomalies', 'outlier', 'outliers', 'strange', 'odd', 'suspicious'],
+                f'Unusual values detected: {summary}',
+                Source('Anomaly radar'),
+            )
+        else:
+            self._index.add(
+                ['unusual', 'anomaly', 'anomalies', 'outlier', 'outliers', 'strange', 'odd', 'suspicious'],
+                "No statistical anomalies were detected in this document's numeric data.",
+                Source('Anomaly radar'),
+            )
+
+        self._index.add(
+            ['quality', 'clean', 'reliable', 'trustworthy'],
+            (
+                f"Data quality score: {forensics['quality_score']}/100, based on "
+                f"{forensics['missing_cells']} missing value(s) and {forensics['duplicate_rows']} "
+                f"duplicate row(s) out of {forensics['total_rows']} record(s)."
+            ),
+            Source('Data forensics'),
+        )
+
+    def _try_compare(self, question: str) -> Optional[AnswerResult]:
+        """Handles "compare X and Y" style questions by looking up each
+        named entity's already-indexed identifier summary directly, rather
+        than relying on FactIndex.best_match, which only ever returns one
+        single best fact."""
+        lowered = question.lower()
+        if not any(trigger in lowered for trigger in _COMPARE_TRIGGERS):
+            return None
+        matches = [summary for key, summary in self._comparables.items() if key in lowered]
+        if len(matches) < 2:
+            return None
+        return AnswerResult(answer=' '.join(matches[:4]), sources=[Source('Comparison')], confidence='medium')
 
     def _build_overview(self) -> None:
         doc_type = self._data.get('document_type') or 'General document'
@@ -122,11 +186,15 @@ class GenericAnswerEngine(AnswerEngine):
                 ]
                 if not parts:
                     continue
+                summary = f"{id_value} ({dataset.get('name')}) — {', '.join(parts)}."
                 self._index.add(
                     set(id_words) | dataset_name_words,
                     f"For {id_col.get('display_name')} \"{id_value}\" in \"{dataset.get('name')}\": {', '.join(parts)}.",
                     Source(f"Dataset: {dataset.get('name')}", f"{id_col.get('display_name')} {id_value}"),
                 )
+                key = str(id_value).strip().lower()
+                if key:
+                    self._comparables[key] = summary
 
     def _build_metrics(self) -> None:
         for metric in self._data.get('metrics') or []:
@@ -198,6 +266,10 @@ class GenericAnswerEngine(AnswerEngine):
 
  
     def answer(self, question: str) -> AnswerResult:
+        comparison = self._try_compare(question)
+        if comparison is not None:
+            return comparison
+
         fact = self._index.best_match(question)
         if fact is not None:
             return AnswerResult(answer=fact.answer_text, sources=[fact.source], confidence=fact.confidence)
@@ -228,5 +300,7 @@ class GenericAnswerEngine(AnswerEngine):
             questions.append('What are the key insights from this document?')
         if entities.get('dates'):
             questions.append('What dates are mentioned in this document?')
+        questions.append('What matters most in this document?')
+        questions.append('What looks unusual?')
 
         return questions[:6]

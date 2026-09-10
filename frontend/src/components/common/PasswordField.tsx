@@ -1,10 +1,6 @@
 import { Eye, EyeOff } from 'lucide-react';
 import { useId, useState } from 'react';
 
-/** A labeled password input with a show/hide toggle — used everywhere a
- * password is entered (login, signup, reset, change password) so users can
- * verify what they typed before submitting. Visually matches AuthCard's
- * plain FormField, just with room for the toggle button. */
 export function PasswordField({
   label,
   value,

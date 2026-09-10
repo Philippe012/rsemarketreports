@@ -36,8 +36,6 @@ function SectionItem({ section }: { section: DocumentSection }) {
   );
 }
 
-/** The raw extracted text, as-is — lets a user verify what the platform
- * actually read out of the document before trusting anything derived from it. */
 export function SectionsList({ sections }: { sections: DocumentSection[] }) {
   if (sections.length === 0) return null;
 
