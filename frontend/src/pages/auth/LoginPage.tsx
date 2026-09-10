@@ -33,7 +33,7 @@ export function LoginPage() {
   return (
     <AuthCard
       title="Sign in"
-      subtitle="Welcome back — enter your details to continue."
+      subtitle="Welcome back enter your details to continue."
       footer={
         <>
           Don&rsquo;t have an account?{' '}
