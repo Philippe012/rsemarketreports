@@ -37,10 +37,10 @@ export function SessionActivityStrip({ trades }: { trades: BondTrade[] }) {
   return (
     <section>
       <div className="mb-3">
-        <h2 className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
+        <h2 className="text-base font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
           Session activity
         </h2>
-        <p className="mt-0.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+        <p className="mt-0.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
           Transactions recorded in this report
         </p>
       </div>
@@ -67,19 +67,19 @@ export function SessionActivityStrip({ trades }: { trades: BondTrade[] }) {
               className="flex w-52.5 shrink-0 flex-col gap-1.5 rounded-lg border px-3.5 py-3"
               style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
             >
-              <p className="truncate text-[13px] font-medium" style={{ color: 'var(--text)' }} title={trade.bond}>
+              <p className="truncate text-sm font-medium" style={{ color: 'var(--text)' }} title={trade.bond}>
                 {trade.bond}
               </p>
               {trade.category && (
-                <p className="text-[10.5px] font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+                <p className="text-sm font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
                   {trade.category}
                 </p>
               )}
               <div className="mt-0.5 flex items-baseline justify-between">
-                <span className="text-[13px] tabular-nums" style={{ color: 'var(--text-secondary)' }}>
+                <span className="text-sm tabular-nums" style={{ color: 'var(--text-secondary)' }}>
                   {formatCompactNumber(trade.volume)}
                 </span>
-                <span className="text-[13px] font-semibold tabular-nums" style={{ color: tone }}>
+                <span className="text-sm font-semibold tabular-nums" style={{ color: tone }}>
                   {formatSignedNumber(trade.change, 3)}
                 </span>
               </div>

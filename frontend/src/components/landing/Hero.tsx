@@ -1,7 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer } from 'recharts';
 import { Link } from 'react-router-dom';
-
 import { Badge } from '../common/Badge';
 import { useTheme } from '../../hooks/useTheme';
 import { CHART_COLORS } from '../../utils/chartColors';
@@ -16,19 +15,24 @@ export function Hero() {
   const colors = CHART_COLORS[theme];
 
   return (
-    <section className="relative overflow-hidden">
-      <div className="mx-auto grid max-w-[1400px] gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:px-8 lg:py-28">
+    <section className="relative overflow-hidden" style={{ background: 'var(--bg)' }}>
+      <div className="hero-backdrop" aria-hidden="true" />
+    
+      <div className="relative z-10 mx-auto grid max-w-[1400px] gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:px-8 lg:py-28">
         <div>
           <Badge tone="neutral">Document intelligence platform</Badge>
-          <h1 className="mt-5 text-[34px] font-semibold leading-[1.15] tracking-tight sm:text-[44px]" style={{ color: 'var(--text)' }}>
-            Turn any document into a live dashboard.
+          <h1
+            className="mt-5 text-[34px] font-semibold leading-[1.15] tracking-tight sm:text-[44px]"
+            style={{ color: 'var(--text)' }}
+          >
+            Turn business documents into trusted data.
           </h1>
           <p className="mt-5 max-w-xl text-[16px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Upload a PDF, Excel, Word, CSV or TXT file. Datapoint extracts the text and tables,
-            validates the numbers, and builds KPIs, charts and an organized Excel export automatically, with nothing invented. Rwanda Stock Exchange market reports get a
-            specialized dashboard; every other document gets a general-purpose one.
+            Upload a PDF, Excel, Word, CSV or TXT file. Rebadata extracts the text and tables,
+            validates every figure against its source, and builds structured datasets, KPIs and
+            charts automatically, with nothing invented. Review what needs a second look, then
+            export to Excel, CSV or JSON, or pull it in through the API.
           </p>
-
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
               to="/signup"
@@ -38,6 +42,7 @@ export function Hero() {
               Get started free
               <ArrowRight size={16} />
             </Link>
+            
             <a
               href="#how-it-works"
               className="inline-flex items-center justify-center gap-2 rounded-lg border px-5 py-3 text-sm font-medium transition hover:opacity-80"
@@ -46,7 +51,6 @@ export function Hero() {
               See how it works
             </a>
           </div>
-
           <p className="mt-5 text-xs" style={{ color: 'var(--text-muted)' }}>
             No credit card required · PDF, Excel, Word, CSV and TXT supported
           </p>
@@ -63,7 +67,7 @@ export function Hero() {
               <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Excel · Processed</p>
             </div>
             <span
-              className="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
+              className="rounded-full px-2.5 py-1 text-sm font-semibold uppercase tracking-wide"
               style={{ background: 'var(--neutral-chip-soft)', color: 'var(--neutral-chip)' }}
             >
               Preview
@@ -72,14 +76,14 @@ export function Hero() {
 
           <div className="grid grid-cols-2 gap-3 p-5">
             <div className="rounded-lg border p-3.5" style={{ borderColor: 'var(--border)' }}>
-              <p className="text-[10px] font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Revenue</p>
+              <p className="text-sm font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Revenue</p>
               <p className="mt-1.5 text-lg font-semibold tabular-nums" style={{ color: 'var(--text)' }}>$4.82M</p>
-              <p className="mt-1 text-[11px] font-medium" style={{ color: 'var(--positive)' }}>+12.4%</p>
+              <p className="mt-1 text-xs font-medium" style={{ color: 'var(--positive)' }}>+12.4%</p>
             </div>
             <div className="rounded-lg border p-3.5" style={{ borderColor: 'var(--border)' }}>
-              <p className="text-[10px] font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Orders</p>
+              <p className="text-sm font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Orders</p>
               <p className="mt-1.5 text-lg font-semibold tabular-nums" style={{ color: 'var(--text)' }}>2,318</p>
-              <p className="mt-1 text-[11px] font-medium" style={{ color: 'var(--positive)' }}>+6.1%</p>
+              <p className="mt-1 text-xs font-medium" style={{ color: 'var(--positive)' }}>+6.1%</p>
             </div>
           </div>
 
@@ -92,6 +96,7 @@ export function Hero() {
           </div>
         </div>
       </div>
+
     </section>
   );
 }

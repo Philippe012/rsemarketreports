@@ -56,13 +56,13 @@ export function SettingsPage() {
       <Card title="Account">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Email</p>
+            <p className="text-sm font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Email</p>
             <p className="mt-1 text-sm" style={{ color: 'var(--text)' }}>{user?.email}</p>
           </div>
         </div>
       </Card>
 
-      <Card title="Appearance" subtitle="Choose how Datapoint looks on this device.">
+      <Card title="Appearance" subtitle="Choose how Rebadata looks on this device.">
         <div className="flex items-center justify-between">
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Theme</p>
           <ThemeToggle />

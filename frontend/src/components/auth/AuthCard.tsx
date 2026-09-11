@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
-import logoIcon from '../../assets/logo-icon-square.png';
+import logoIcon from '../../assets/rebadata-logo-icon.png';
 import { Spinner } from '../common/Spinner';
 
 export function AuthCard({
@@ -18,8 +18,8 @@ export function AuthCard({
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12" style={{ background: 'var(--bg)' }}>
       <Link to="/" className="mb-8 flex items-center gap-2.5">
-        <img src={logoIcon} alt="Datapoint" className="h-9 w-9 rounded-lg object-contain" />
-        <span className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--text)' }}>Datapoint</span>
+        <img src={logoIcon} alt="Rebadata" className="h-9 w-9 rounded-lg object-contain" />
+        <span className="text-base font-semibold tracking-tight" style={{ color: 'var(--text)' }}>Rebadata</span>
       </Link>
 
       <div

@@ -12,10 +12,10 @@ const TREND = [
 ];
 
 const ROWS = [
-  { name: 'BOK', closing: 660, change: '+1.2%' },
-  { name: 'BLR', closing: 515, change: '-0.4%' },
-  { name: 'NMG', closing: 1200, change: '0.0%' },
-  { name: 'KCB', closing: 500, change: '+0.8%' },
+  { name: 'Warehouse A', closing: 660, change: '+1.2%' },
+  { name: 'Warehouse B', closing: 515, change: '-0.4%' },
+  { name: 'Warehouse C', closing: 1200, change: '0.0%' },
+  { name: 'Warehouse D', closing: 500, change: '+0.8%' },
 ];
 
 export function DashboardPreview() {
@@ -26,10 +26,10 @@ export function DashboardPreview() {
     <Section
       eyebrow="Dashboard"
       heading="A dashboard shaped by your data, not a fixed template"
-      subheading="Charts and tables are generated from what's actually in the document — illustrative sample shown below."
+      subheading="Charts and tables are generated from what's actually in the document illustrative sample shown below."
     >
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-        <Card title="Index trend" subtitle="7-month closing value">
+        <Card title="Inventory trend" subtitle="7-month stock level">
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={TREND}>
@@ -42,12 +42,12 @@ export function DashboardPreview() {
           </div>
         </Card>
 
-        <Card title="Top securities" subtitle="Closing price & change">
+        <Card title="Top locations" subtitle="Units on hand & change">
           <TableShell>
             <thead>
               <tr>
-                <TH>Ticker</TH>
-                <TH align="right">Closing</TH>
+                <TH>Location</TH>
+                <TH align="right">Units</TH>
                 <TH align="right">Change</TH>
               </tr>
             </thead>

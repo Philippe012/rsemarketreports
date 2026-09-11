@@ -11,7 +11,7 @@ const PRINCIPLES = [
   {
     icon: UserCheck,
     title: 'Session-based authentication',
-    description: 'Sign-in is handled by the backend with secure, cookie-based sessions and CSRF protection — not a client-side check that can be bypassed.',
+    description: 'Sign-in is handled by the backend with secure, cookie-based sessions and CSRF protection not a client-side check that can be bypassed.',
   },
   {
     icon: ShieldCheck,
@@ -35,7 +35,7 @@ export function Security() {
               <principle.icon size={17} />
             </div>
             <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{principle.title}</p>
-            <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{principle.description}</p>
+            <p className="mt-1.5 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{principle.description}</p>
           </div>
         ))}
       </div>

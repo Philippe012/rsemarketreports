@@ -29,7 +29,7 @@ export function WhatMattersMost({ findings }: { findings: RankedFinding[] }) {
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
                 <Badge tone={severityTone(finding.severity)}>{finding.severity}</Badge>
-                <span className="text-[10px] uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+                <span className="text-sm uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
                   {CATEGORY_LABEL[finding.category]}
                 </span>
               </div>

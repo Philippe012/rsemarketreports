@@ -45,19 +45,19 @@ export function WhatIfSimulator({ metrics }: { metrics: DocumentMetric[] }) {
 
       <div className="mt-4 grid grid-cols-3 gap-3 text-center">
         <div className="rounded-md border px-3 py-3" style={{ borderColor: 'var(--border)' }}>
-          <p className="text-[11px] uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Actual</p>
+          <p className="text-sm uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Actual</p>
           <p className="mt-1 text-lg font-semibold tabular-nums" style={{ color: 'var(--text)' }}>{formatNumber(actual, 2)}</p>
         </div>
         <div className="rounded-md border px-3 py-3" style={{ borderColor: 'var(--border)' }}>
-          <p className="text-[11px] uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Assumption</p>
+          <p className="text-sm uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Assumption</p>
           <p className="mt-1 text-lg font-semibold tabular-nums" style={{ color: 'var(--warning)' }}>{percentChange > 0 ? '+' : ''}{percentChange}%</p>
         </div>
         <div className="rounded-md border px-3 py-3" style={{ borderColor: 'var(--brand)' }}>
-          <p className="text-[11px] uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Projection</p>
+          <p className="text-sm uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Projection</p>
           <p className="mt-1 text-lg font-semibold tabular-nums" style={{ color: 'var(--brand)' }}>{formatNumber(projection, 2)}</p>
         </div>
       </div>
-      <p className="mt-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>
+      <p className="mt-3 text-sm" style={{ color: 'var(--text-muted)' }}>
         The projection is a client-side calculation (actual × (1 + assumption)) and is never written back as extracted data.
       </p>
     </Card>

@@ -3,6 +3,7 @@ export interface User {
   email: string;
   date_joined: string;
   is_staff: boolean;
+  avatar_url?: string | null;
 }
 
 export interface SignupPayload {

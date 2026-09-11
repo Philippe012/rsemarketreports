@@ -14,7 +14,7 @@ export function TableShell({ children }: { children: ReactNode }) {
 export function TH({ children, align = 'left' }: { children: ReactNode; align?: 'left' | 'right' | 'center' }) {
   return (
     <th
-      className={`sticky top-0 whitespace-nowrap border-b px-4 py-2.5 text-xs font-semibold uppercase tracking-wide ${
+      className={`sticky top-0 whitespace-nowrap border-b px-4 py-2.5 text-sm font-semibold uppercase tracking-wide ${
         align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left'
       }`}
       style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--surface)' }}

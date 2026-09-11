@@ -19,7 +19,7 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
   if (!active || !payload?.length) return null;
   return (
     <div
-      className="rounded-md border px-3 py-2 text-xs shadow-lg"
+      className="rounded-md border px-3 py-2 text-sm shadow-lg"
       style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}
     >
       <p className="mb-1 font-medium">{label}</p>

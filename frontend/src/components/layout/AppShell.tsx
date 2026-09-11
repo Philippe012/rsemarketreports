@@ -2,7 +2,7 @@ import { LayoutDashboard, LogOut, Menu, Settings, ShieldCheck, UploadCloud, User
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
-import logoIcon from '../../assets/logo-icon-square.png';
+import logoIcon from '../../assets/rebadata-logo-icon.png';
 import { ThemeToggle } from '../common/ThemeToggle';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -30,11 +30,6 @@ export function AppShell() {
 
   const handleLogout = async () => {
     setMenuOpen(false);
-    // Navigate away from the protected /app tree BEFORE clearing the auth
-    // state: otherwise ProtectedRoute (still mounted for a tick) reacts to
-    // status flipping to 'anonymous' and races this navigation to /login,
-    // occasionally winning and stranding the user there instead of on the
-    // landing page.
     navigate('/', { replace: true });
     await logout();
   };
@@ -57,9 +52,9 @@ export function AppShell() {
           </button>
 
           <NavLink to="/app" className="flex items-center gap-2.5">
-            <img src={logoIcon} alt="Datapoint" className="h-8 w-8 shrink-0 rounded-lg object-contain" />
-            <span className="hidden text-[15px] font-semibold tracking-tight sm:inline" style={{ color: 'var(--text)' }}>
-              Datapoint
+            <img src={logoIcon} alt="Rebadata" className="h-8 w-8 shrink-0 rounded-lg object-contain" />
+            <span className="hidden text-base font-semibold tracking-tight sm:inline" style={{ color: 'var(--text)' }}>
+              Rebadata
             </span>
           </NavLink>
 
@@ -85,18 +80,22 @@ export function AppShell() {
               <button
                 type="button"
                 onClick={() => setMenuOpen((v) => !v)}
-                className="flex h-9 items-center gap-2 rounded-full border pl-1 pr-3 transition hover:opacity-80"
+                className="flex h-9 w-9 items-center justify-center rounded-full border transition hover:opacity-80"
                 style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+                aria-label="Account menu"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
               >
-                <span
-                  className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold"
-                  style={{ background: 'var(--brand-soft)', color: 'var(--brand)' }}
-                >
-                  {(user?.email ?? '?').charAt(0).toUpperCase()}
-                </span>
-                <span className="hidden max-w-[10rem] truncate text-sm font-medium sm:inline" style={{ color: 'var(--text)' }}>
-                  {user?.email}
-                </span>
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt="" className="h-full w-full rounded-full object-cover" />
+                ) : (
+                  <span
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold"
+                    style={{ background: 'var(--brand-soft)', color: 'var(--brand)' }}
+                  >
+                    {(user?.email ?? '?').charAt(0).toUpperCase()}
+                  </span>
+                )}
               </button>
 
               {menuOpen && (

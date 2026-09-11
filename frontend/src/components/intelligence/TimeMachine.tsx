@@ -66,7 +66,7 @@ export function TimeMachine({ reportId }: { reportId: string }) {
         </div>
       )}
 
-      {error && <p className="mt-3 text-xs" style={{ color: 'var(--negative)' }}>{error}</p>}
+      {error && <p className="mt-3 text-sm" style={{ color: 'var(--negative)' }}>{error}</p>}
 
       {result && !result.comparable && (
         <p className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>{result.reason}</p>

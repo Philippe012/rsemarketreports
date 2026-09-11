@@ -63,7 +63,7 @@ export function GenericDashboard({ report }: { report: GenericReport }) {
               key={item.id}
               type="button"
               onClick={() => scrollTo(item.id)}
-              className="rounded-full border px-3 py-1.5 text-xs font-medium transition hover:opacity-80"
+              className="rounded-full border px-3 py-1.5 text-sm font-medium transition hover:opacity-80"
               style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text-secondary)' }}
             >
               {item.label}
@@ -76,8 +76,8 @@ export function GenericDashboard({ report }: { report: GenericReport }) {
         {hasDatasets ? (
           <section>
             <div className="mb-3">
-              <h2 className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--text)' }}>Overview</h2>
-              <p className="mt-0.5 text-xs" style={{ color: 'var(--text-secondary)' }}>Key figures computed from the extracted data</p>
+              <h2 className="text-base font-semibold tracking-tight" style={{ color: 'var(--text)' }}>Overview</h2>
+              <p className="mt-0.5 text-sm" style={{ color: 'var(--text-secondary)' }}>Key figures computed from the extracted data</p>
             </div>
             <MetricsGrid metrics={document.metrics} />
           </section>
@@ -101,7 +101,7 @@ export function GenericDashboard({ report }: { report: GenericReport }) {
                   key={dataset.name}
                   type="button"
                   onClick={() => scrollTo(`dataset-${dataset.name}`)}
-                  className="rounded-full border px-3 py-1.5 text-xs font-medium transition hover:opacity-80"
+                  className="rounded-full border px-3 py-1.5 text-sm font-medium transition hover:opacity-80"
                   style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text-secondary)' }}
                 >
                   {dataset.name}
@@ -145,10 +145,10 @@ export function GenericDashboard({ report }: { report: GenericReport }) {
 
       <div ref={(el) => { sectionRefs.current.intelligence = el; }}>
         <div className="mb-3">
-          <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
+          <h2 className="flex items-center gap-2 text-base font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
             <BrainCircuit size={16} /> Advanced Intelligence
           </h2>
-          <p className="mt-0.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+          <p className="mt-0.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
             Deterministic analysis on top of the extracted data — nothing here invents a number.
           </p>
         </div>
@@ -168,7 +168,7 @@ export function GenericDashboard({ report }: { report: GenericReport }) {
           <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
             Reviewed everything? Export the full document.
           </p>
-          <p className="mt-0.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+          <p className="mt-0.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
             Downloads every dataset above as an organized Excel workbook.
           </p>
         </div>

@@ -9,7 +9,7 @@ function ChipGroup({ label, values }: { label: string; values: string[] }) {
   if (values.length === 0) return null;
   return (
     <div>
-      <p className="mb-2 text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>
+      <p className="mb-2 text-sm font-medium uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>
         {label}
       </p>
       <div className="flex flex-wrap gap-1.5">

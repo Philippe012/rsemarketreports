@@ -31,12 +31,12 @@ export function Card({ title, subtitle, actions, children, className = '', icon 
             )}
             <div>
               {title && (
-                <h2 className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
+                <h2 className="text-base font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
                   {title}
                 </h2>
               )}
               {subtitle && (
-                <p className="mt-0.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                <p className="mt-0.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
                   {subtitle}
                 </p>
               )}

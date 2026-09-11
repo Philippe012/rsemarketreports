@@ -7,13 +7,13 @@ import { CHART_COLORS } from '../../utils/chartColors';
 import { formatNumber } from '../../utils/formatters';
 import { Card } from '../common/Card';
 
-const POSITIVE = { light: '#146c43', dark: '#34c47a' } as const;
+const POSITIVE = { light: '#14161a', dark: '#f4f4f3' } as const;
 const NEGATIVE = { light: '#b3261e', dark: '#e5534b' } as const;
 
 function ChangeTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-md border px-3 py-2 text-xs shadow-lg" style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}>
+    <div className="rounded-md border px-3 py-2 text-sm shadow-lg" style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}>
       <p className="mb-1 font-medium">{label}</p>
       <p className="tabular-nums">{formatNumber(payload[0].value, 2)}</p>
     </div>
@@ -43,8 +43,8 @@ export function MarketAnalyticsSection({ equities }: { equities: Equity[] }) {
   return (
     <section>
       <div className="mb-3">
-        <h2 className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--text)' }}>Market analytics</h2>
-        <p className="mt-0.5 text-xs" style={{ color: 'var(--text-secondary)' }}>Movers and activity from today's session</p>
+        <h2 className="text-base font-semibold tracking-tight" style={{ color: 'var(--text)' }}>Market analytics</h2>
+        <p className="mt-0.5 text-sm" style={{ color: 'var(--text-secondary)' }}>Movers and activity from today's session</p>
       </div>
       <div className="grid gap-6 xl:grid-cols-2">
         {movers.length > 0 && (

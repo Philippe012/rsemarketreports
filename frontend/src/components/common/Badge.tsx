@@ -13,7 +13,7 @@ export function Badge({ tone = 'neutral', children }: { tone?: Tone; children: R
   const style = TONE_STYLES[tone];
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium tabular-nums"
+      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-medium tabular-nums"
       style={{ background: style.bg, color: style.fg }}
     >
       {children}

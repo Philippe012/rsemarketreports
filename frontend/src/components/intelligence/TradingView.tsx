@@ -26,7 +26,7 @@ export function TradingView({ trading }: { trading: TradingAnalytics }) {
         <div className="grid gap-6 lg:grid-cols-2">
           {trading.top_gainers.length > 0 && (
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Top Gainers</p>
+              <p className="mb-2 text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Top Gainers</p>
               <ul className="space-y-2">
                 {trading.top_gainers.slice(0, 5).map((eq) => (
                   <EquityRow key={eq.ticker} label={`${eq.ticker} · ${formatSignedNumber(eq.change, 2)}`} value={eq.closing} />
@@ -36,7 +36,7 @@ export function TradingView({ trading }: { trading: TradingAnalytics }) {
           )}
           {trading.top_losers.length > 0 && (
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Top Losers</p>
+              <p className="mb-2 text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Top Losers</p>
               <ul className="space-y-2">
                 {trading.top_losers.slice(0, 5).map((eq) => (
                   <EquityRow key={eq.ticker} label={`${eq.ticker} · ${formatSignedNumber(eq.change, 2)}`} value={eq.closing} />
@@ -46,7 +46,7 @@ export function TradingView({ trading }: { trading: TradingAnalytics }) {
           )}
           {trading.volume_leaders.length > 0 && (
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Volume Leaders</p>
+              <p className="mb-2 text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Volume Leaders</p>
               <ul className="space-y-2">
                 {trading.volume_leaders.slice(0, 5).map((eq) => (
                   <EquityRow key={eq.ticker} label={eq.ticker} value={eq.volume} />
@@ -56,7 +56,7 @@ export function TradingView({ trading }: { trading: TradingAnalytics }) {
           )}
           {trading.index_performance.length > 0 && (
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Index Performance</p>
+              <p className="mb-2 text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Index Performance</p>
               <ul className="space-y-2">
                 {trading.index_performance.map((idx) => (
                   <EquityRow key={idx.name} label={`${idx.name} · ${formatSignedNumber(idx.percent_change, 2)}%`} value={idx.closing} />
@@ -69,7 +69,7 @@ export function TradingView({ trading }: { trading: TradingAnalytics }) {
 
       {trading.bond_yield_ranking.length > 0 && (
         <div className="mt-6">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Bond Yield Ranking</p>
+          <p className="mb-2 text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Bond Yield Ranking</p>
           <TableShell>
             <thead>
               <tr>

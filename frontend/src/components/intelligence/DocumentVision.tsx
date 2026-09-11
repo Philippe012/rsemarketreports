@@ -17,7 +17,7 @@ export function DocumentVision({ vision }: { vision: VisionSummary }) {
         {tiles.map((tile) => (
           <div key={tile.label} className="rounded-md border px-3 py-3 text-center" style={{ borderColor: 'var(--border)' }}>
             <p className="text-xl font-semibold tabular-nums" style={{ color: 'var(--text)' }}>{tile.value}</p>
-            <p className="mt-1 text-[11px]" style={{ color: 'var(--text-secondary)' }}>{tile.label}</p>
+            <p className="mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>{tile.label}</p>
           </div>
         ))}
       </div>

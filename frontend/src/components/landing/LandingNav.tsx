@@ -2,7 +2,7 @@ import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import logoIcon from '../../assets/logo-icon-square.png';
+import logoIcon from '../../assets/rebadata-logo-icon.png';
 import { ThemeToggle } from '../common/ThemeToggle';
 
 const LINKS = [
@@ -22,8 +22,8 @@ export function LandingNav() {
     >
       <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2.5">
-          <img src={logoIcon} alt="Datapoint" className="h-9 w-9 shrink-0 rounded-lg object-contain" />
-          <span className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--text)' }}>Datapoint</span>
+          <img src={logoIcon} alt="Rebadata" className="h-9 w-9 shrink-0 rounded-lg object-contain" />
+          <span className="text-base font-semibold tracking-tight" style={{ color: 'var(--text)' }}>Rebadata</span>
         </Link>
 
         <nav className="hidden items-center gap-7 lg:flex" aria-label="Section">

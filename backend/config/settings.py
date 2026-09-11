@@ -67,7 +67,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'datapoint'),
+        'NAME': os.environ.get('DB_NAME', 'rebadata'),
         'USER': os.environ.get('DB_USER', 'postgres'),
         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
@@ -111,7 +111,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'Datapoint <no-reply@datapoint.local>'
+DEFAULT_FROM_EMAIL = 'Rebadata <no-reply@rebadata.local>'
 
 
 MEDIA_URL = '/media/'
@@ -142,8 +142,8 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    'http://rsemarketreports.localhost:5173',
-    'http://rsemarketreports.localhost:8000',
+    'http://rebadata.localhost:5173',
+    'http://rebadata.localhost:8000',
     'http://localhost:5173',
     'http://127.0.0.1:5173',
 ]
@@ -152,8 +152,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_EXPOSE_HEADERS = ['Content-Disposition']
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://rsemarketreports.localhost:5173',
-    'http://rsemarketreports.localhost:8000',
+    'http://rebadata.localhost:5173',
+    'http://rebadata.localhost:8000',
     'http://localhost:5173',
     'http://localhost:8000',
 ]
@@ -164,4 +164,4 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_HTTPONLY = False
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://rsemarketreports.localhost:5173')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://rebadata.localhost:5173')

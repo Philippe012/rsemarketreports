@@ -25,7 +25,7 @@ export function FiguresGrid({ figures }: { figures: DocumentFigure[] }) {
             <div className="px-2.5 py-2">
               <p className="text-xs font-medium" style={{ color: 'var(--text)' }}>{figure.source}</p>
               {figure.width && figure.height && (
-                <p className="text-[11px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
+                <p className="text-xs tabular-nums" style={{ color: 'var(--text-muted)' }}>
                   {figure.width} × {figure.height}
                 </p>
               )}

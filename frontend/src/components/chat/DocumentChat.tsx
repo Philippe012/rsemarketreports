@@ -18,7 +18,7 @@ function SourceChips({ sources }: { sources: ChatMessage['sources'] }) {
       {sources.map((source, i) => (
         <span
           key={i}
-          className="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium"
+          className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium"
           style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-subtle)' }}
         >
           {source.label}
@@ -47,7 +47,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         </div>
         {!isUser && <SourceChips sources={message.sources} />}
         {!isUser && note && (
-          <p className="mt-1 text-[11px]" style={{ color: 'var(--text-muted)' }}>{note}</p>
+          <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>{note}</p>
         )}
       </div>
     </div>
@@ -174,7 +174,7 @@ export function DocumentChat({ reportId, documentTitle }: { reportId: string; do
       )}
 
       {error && (
-        <p className="border-t px-4 py-2 text-xs" style={{ borderColor: 'var(--border)', color: 'var(--negative)' }}>
+        <p className="border-t px-4 py-2 text-sm" style={{ borderColor: 'var(--border)', color: 'var(--negative)' }}>
           {error}
         </p>
       )}

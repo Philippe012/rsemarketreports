@@ -19,10 +19,10 @@ export function MarketOverviewSection({ overview }: { overview: MarketOverview }
   return (
     <section>
       <div className="mb-3">
-        <h2 className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
+        <h2 className="text-base font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
           Market overview
         </h2>
-        <p className="mt-0.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+        <p className="mt-0.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
           Today&apos;s key market figures
         </p>
       </div>

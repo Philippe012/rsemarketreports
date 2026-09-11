@@ -22,7 +22,7 @@ export function AnomalyRadar({ anomalies }: { anomalies: AnomalyRecord[] }) {
               <Badge tone={severityTone(anomaly.severity)}>{anomaly.severity}</Badge>
               <div className="min-w-0">
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text)' }}>{anomaly.message}</p>
-                <p className="mt-1 text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                <p className="mt-1 text-xs" style={{ color: 'var(--text-muted)' }}>
                   {anomaly.dataset} · {anomaly.column} · {anomaly.type.replace(/_/g, ' ')}
                 </p>
               </div>

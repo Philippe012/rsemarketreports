@@ -23,9 +23,6 @@ User = get_user_model()
 
 
 class CsrfView(APIView):
-    """GET this once on app boot so the browser has a `csrftoken` cookie
-    before the first POST (signup/login/etc.) needs to send it back as the
-    X-CSRFToken header."""
     permission_classes = [AllowAny]
 
     def get(self, request):
@@ -100,9 +97,9 @@ class PasswordResetRequestView(APIView):
             token = default_token_generator.make_token(user)
             reset_link = f'{settings.FRONTEND_URL}/reset-password/{uid}/{token}'
             send_mail(
-                subject='Reset your Datapoint password',
+                subject='Reset your Rebadata password',
                 message=(
-                    'We received a request to reset your Datapoint password.\n\n'
+                    'We received a request to reset your Rebadata password.\n\n'
                     f'Reset it here: {reset_link}\n\n'
                     'If you did not request this, you can safely ignore this email.'
                 ),

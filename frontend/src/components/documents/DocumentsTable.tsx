@@ -155,7 +155,7 @@ export function DocumentsTable({
                     </div>
                     <div className="min-w-0">
                       <RowFilename report={report} onRename={onRename} />
-                      <p className="mt-0.5 text-xs" style={{ color: 'var(--text-muted)' }}>{report.source_type.toUpperCase()}</p>
+                      <p className="mt-0.5 text-sm" style={{ color: 'var(--text-muted)' }}>{report.source_type.toUpperCase()}</p>
                     </div>
                   </div>
                 </td>

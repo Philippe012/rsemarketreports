@@ -18,7 +18,7 @@ export function WarningsPanel({ warnings }: { warnings: string[] }) {
         <span className="flex items-center gap-2.5">
           <AlertTriangle size={15} style={{ color: 'var(--warning)' }} />
           <span>
-            <span className="block text-[11px] font-semibold uppercase tracking-wide" style={{ color: 'var(--warning)' }}>
+            <span className="block text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--warning)' }}>
               Data quality
             </span>
             <span className="text-sm font-medium" style={{ color: 'var(--text)' }}>

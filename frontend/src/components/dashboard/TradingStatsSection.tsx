@@ -28,13 +28,13 @@ export function TradingStatsSection({ stats }: { stats: TradingStat[] }) {
               className="rounded-lg border p-4"
               style={{ borderColor: 'var(--border)', background: 'var(--bg-subtle)' }}
             >
-              <p className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm font-medium uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>
                 {stat.label}
               </p>
               <p className="mt-2 text-xl font-semibold tabular-nums" style={{ color: 'var(--text)' }}>
                 {formatNumber(stat.today)}
               </p>
-              <div className="mt-2 flex items-center justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
+              <div className="mt-2 flex items-center justify-between text-sm" style={{ color: 'var(--text-muted)' }}>
                 <span>Previous: {formatNumber(stat.previous)}</span>
                 <ChangeIndicator stat={stat} />
               </div>

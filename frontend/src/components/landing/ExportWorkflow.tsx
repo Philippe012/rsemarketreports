@@ -7,13 +7,13 @@ export function ExportWorkflow() {
     <Section tone="subtle">
       <div className="grid items-center gap-10 lg:grid-cols-2">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--brand)' }}>Export</p>
+          <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--brand)' }}>Export</p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl" style={{ color: 'var(--text)' }}>
             Take the data with you
           </h2>
           <p className="mt-3 max-w-md text-[15px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Once you&rsquo;ve reviewed the dashboard, download a clean, formatted Excel workbook — every
-            dataset, table and figure organized onto its own sheet, matching what you saw on screen.
+            Once you&rsquo;ve reviewed the data, export a clean, formatted Excel workbook, CSV or JSON
+            every dataset, table and figure organized to match what you saw on screen.
             No manual re-entry, no reformatting.
           </p>
           <div className="mt-6 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold" style={{ background: 'var(--brand)', color: 'var(--brand-contrast)' }}>
@@ -28,12 +28,12 @@ export function ExportWorkflow() {
               <FileSpreadsheet size={18} />
             </div>
             <div>
-              <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>RSE_Report_2026-09-07.xlsx</p>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>7 sheets · generated just now</p>
+              <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Quarterly_Report_2026-09-07.xlsx</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>5 sheets · generated just now</p>
             </div>
           </div>
           <ul className="mt-4 space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-            {['MARKET SUMMARY', 'STOCK', 'BONDS', 'BONDS TRADES', 'EXCHANGE RATE'].map((sheet) => (
+            {['SUMMARY', 'REVENUE', 'EXPENSES', 'INVENTORY', 'TRANSACTIONS'].map((sheet) => (
               <li key={sheet} className="flex items-center justify-between rounded-md px-3 py-2" style={{ background: 'var(--bg-subtle)' }}>
                 <span className="font-medium" style={{ color: 'var(--text)' }}>{sheet}</span>
                 <span className="text-xs" style={{ color: 'var(--text-muted)' }}>sheet</span>

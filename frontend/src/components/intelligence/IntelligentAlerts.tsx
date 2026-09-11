@@ -73,7 +73,7 @@ export function IntelligentAlerts({
             >
               <div className="min-w-0 text-sm" style={{ color: 'var(--text)' }}>
                 <p className="font-medium">{alert.metric_label}</p>
-                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                   {alert.dataset} · {alert.column} {OPERATOR_LABEL[alert.operator]} {formatNumber(alert.threshold, 2)}
                   {alert.current_value !== null && ` (currently ${formatNumber(alert.current_value, 2)})`}
                 </p>
@@ -137,8 +137,8 @@ export function IntelligentAlerts({
           </button>
         </div>
       </form>
-      {error && <p className="mt-2 text-xs" style={{ color: 'var(--negative)' }}>{error}</p>}
-      <p className="mt-2 text-[11px]" style={{ color: 'var(--text-muted)' }}>
+      {error && <p className="mt-2 text-sm" style={{ color: 'var(--negative)' }}>{error}</p>}
+      <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>
         Dataset/column names must match one shown in the datasets above (e.g. "Equities" / "closing", or a generic dataset's column name). The threshold compares against the column's total.
       </p>
     </Card>

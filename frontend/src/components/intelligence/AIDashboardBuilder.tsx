@@ -51,7 +51,7 @@ export function AIDashboardBuilder({ reportId, datasets }: { reportId: string; d
         </button>
       </form>
 
-      {error && <p className="mt-3 text-xs" style={{ color: 'var(--negative)' }}>{error}</p>}
+      {error && <p className="mt-3 text-sm" style={{ color: 'var(--negative)' }}>{error}</p>}
 
       {result && (
         <div className="mt-4">

@@ -25,7 +25,7 @@ export function GeographicIntelligence({ geography }: { geography: GeoData }) {
                     if (!active || !payload?.length) return null;
                     const point = payload[0].payload as GeoData['points'][number];
                     return (
-                      <div className="rounded-md border px-3 py-2 text-xs shadow-lg" style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}>
+                      <div className="rounded-md border px-3 py-2 text-sm shadow-lg" style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}>
                         <p className="font-medium">{point.label}</p>
                         {point.value !== null && <p className="tabular-nums">{formatNumber(point.value, 2)}</p>}
                       </div>

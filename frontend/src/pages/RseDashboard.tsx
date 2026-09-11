@@ -67,10 +67,10 @@ export function RseDashboard({ report }: { report: RseReport }) {
 
       <div>
         <div className="mb-3">
-          <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
+          <h2 className="flex items-center gap-2 text-base font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
             <BrainCircuit size={16} /> Advanced Intelligence
           </h2>
-          <p className="mt-0.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+          <p className="mt-0.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
             Deterministic analysis on top of the extracted market data — nothing here invents a number.
           </p>
         </div>
@@ -85,7 +85,7 @@ export function RseDashboard({ report }: { report: RseReport }) {
           <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
             Reviewed everything? Export the full report.
           </p>
-          <p className="mt-0.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
+          <p className="mt-0.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
             Downloads a validated, organized Excel workbook with every section above.
           </p>
         </div>

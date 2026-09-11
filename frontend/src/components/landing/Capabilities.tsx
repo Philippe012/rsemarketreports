@@ -32,7 +32,7 @@ export function Capabilities() {
       tone="subtle"
       eyebrow="Capabilities"
       heading="Built for accuracy, not guesswork"
-      subheading="A general-purpose document engine with a specialized profile for Rwanda Stock Exchange market reports."
+      subheading="A core document intelligence engine, with specialized workflows layered on top for finance, accounting, logistics and agriculture."
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {CAPABILITIES.map((capability) => (
@@ -48,7 +48,7 @@ export function Capabilities() {
               <capability.icon size={17} />
             </div>
             <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{capability.title}</p>
-            <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{capability.description}</p>
+            <p className="mt-1.5 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{capability.description}</p>
           </div>
         ))}
       </div>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const API_BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://rsemarketreports.localhost:8000';
+export const API_BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://rebadata.localhost:8000';
 
 const CSRF_COOKIE_NAME = 'csrftoken';
 const CSRF_HEADER_NAME = 'X-CSRFToken';

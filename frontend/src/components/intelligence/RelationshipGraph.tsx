@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 
 import { Card } from '../common/Card';
 import { EmptyState } from '../common/EmptyState';
-import { useTheme } from '../../hooks/useTheme';
 import type { RelationshipGraph as RelationshipGraphData } from '../../types/intelligence';
 
 const SIZE = 360;
@@ -11,7 +10,6 @@ const CENTER = SIZE / 2;
 const RADIUS = SIZE / 2 - 48;
 
 export function RelationshipGraph({ graph }: { graph: RelationshipGraphData }) {
-  const { theme } = useTheme();
   const positions = useMemo(() => {
     const map = new Map<string, { x: number; y: number }>();
     graph.nodes.forEach((node, i) => {
@@ -21,8 +19,8 @@ export function RelationshipGraph({ graph }: { graph: RelationshipGraphData }) {
     return map;
   }, [graph.nodes]);
 
-  const edgeColor = theme === 'dark' ? '#4b5563' : '#cbd5e1';
-  const nodeFill = theme === 'dark' ? '#1f6feb33' : '#eaf3ec';
+  const edgeColor = 'var(--border-strong)';
+  const nodeFill = 'var(--surface-hover)';
 
   return (
     <Card title="Entity Relationship Graph" subtitle="Values that co-occur in the same row, and correlated numeric columns" icon={<Share2 size={16} />}>

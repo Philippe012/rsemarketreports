@@ -21,7 +21,7 @@ export function Section({
         {(eyebrow || heading) && (
           <div className="mx-auto mb-10 max-w-2xl text-center">
             {eyebrow && (
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--brand)' }}>
+              <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--brand)' }}>
                 {eyebrow}
               </p>
             )}

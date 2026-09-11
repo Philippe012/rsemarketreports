@@ -1,6 +1,6 @@
-# Frontend — Datapoint
+# Frontend — Rebadata
 
-React + TypeScript + Vite frontend for the document-to-dashboard platform. See the
+React + TypeScript + Vite frontend for the document-to-data platform. See the
 [project root README](../README.md) for the full product overview, architecture, and setup for both
 the backend and frontend.
 
@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Served at `http://rsemarketreports.localhost:5173` (see the root README for why, and for the
+Served at `http://rebadata.localhost:5173` (see the root README for why, and for the
 one-time-per-machine notes on that hostname).
 
 ## Commands

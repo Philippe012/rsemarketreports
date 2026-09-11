@@ -6,12 +6,12 @@ import { CHART_COLORS } from '../../utils/chartColors';
 import { aggregateForChart } from '../../utils/genericFormat';
 import { formatNumber } from '../../utils/formatters';
 
-const PIE_COLORS = ['#146c43', '#5c5f63', '#a1590a', '#8a8d91', '#2f9e63', '#3c4044'];
+const PIE_COLORS = ['#14161a', '#5c5f63', '#a1590a', '#8a8d91', '#ae2a22', '#3c4044'];
 
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-md border px-3 py-2 text-xs shadow-lg" style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}>
+    <div className="rounded-md border px-3 py-2 text-sm shadow-lg" style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}>
       <p className="mb-1 font-medium">{label}</p>
       <p className="tabular-nums">{formatNumber(payload[0].value, 2)}</p>
     </div>

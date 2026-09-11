@@ -21,8 +21,8 @@ export function UploadPage() {
           Upload a document
         </h1>
         <p className="mx-auto mt-2.5 max-w-lg text-sm" style={{ color: 'var(--text-secondary)' }}>
-          An RSE market report gets its specialized dashboard; any other document is structured
-          into datasets, metrics and charts automatically.
+          Your document is structured into datasets, metrics and charts automatically. Recognized
+          formats like RSE market reports get their own specialized dashboard.
         </p>
       </div>
 

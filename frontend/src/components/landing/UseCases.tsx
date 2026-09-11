@@ -2,24 +2,29 @@ import { Section } from './Section';
 
 const USE_CASES = [
   {
-    tag: 'Specialized',
-    title: 'RSE market reports',
-    description: 'Rwanda Stock Exchange daily reports get a purpose-built dashboard: equities, bonds, indices, exchange rates and trading activity, laid out exactly as analysts expect.',
+    tag: 'Finance',
+    title: 'Financial document intelligence',
+    description: 'Market reports and financial statements are structured into equities, bonds, indices and exchange-rate datasets. Rwanda Stock Exchange reports get a purpose-built dashboard as one specialized profile.',
+  },
+  {
+    tag: 'Accounting',
+    title: 'Invoices & accounting automation',
+    description: 'Invoices, receipts and accounting documents are parsed into line items, totals and dates, validated against each other, and ready to export or reconcile.',
+  },
+  {
+    tag: 'Logistics',
+    title: 'Logistics & shipping documents',
+    description: 'Waybills, manifests and shipment records are classified automatically and turned into trackable datasets, KPIs and trend charts.',
+  },
+  {
+    tag: 'Agriculture',
+    title: 'Agriculture & operations reports',
+    description: 'Yield reports, supply logs and field data however they arrive are profiled, structured and organized into datasets you can browse and export.',
   },
   {
     tag: 'Generic',
-    title: 'Sales & operations data',
-    description: 'CSV exports or spreadsheets of sales, shipments or throughput are classified automatically and turned into KPIs and trend charts.',
-  },
-  {
-    tag: 'Generic',
-    title: 'HR & workforce records',
-    description: 'Multi-sheet Excel workbooks employee rosters, department breakdowns become linked datasets you can browse and export.',
-  },
-  {
-    tag: 'Generic',
-    title: 'Narrative reports & notes',
-    description: 'Word documents and text files with prose and embedded tables are split into sections, entities and datasets, even with no template at all.',
+    title: 'Any business document',
+    description: 'Spreadsheets, Word documents and text files with no template at all are split into sections, entities and datasets by the same underlying engine.',
   },
 ];
 
@@ -28,18 +33,15 @@ export function UseCases() {
     <Section
       id="use-cases"
       eyebrow="Use cases"
-      heading="One engine, many kinds of documents"
-      subheading="RSE market reports are a specialized profile inside a universal document-intelligence engine — not the whole product."
+      heading="One engine, every business document"
+      subheading="A general-purpose document intelligence engine with specialized workflows for the domains that need them RSE market reports included."
     >
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {USE_CASES.map((useCase) => (
           <div key={useCase.title} className="rounded-lg border p-5" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
             <span
-              className="inline-block rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
-              style={{
-                background: useCase.tag === 'Specialized' ? 'var(--brand-soft)' : 'var(--neutral-chip-soft)',
-                color: useCase.tag === 'Specialized' ? 'var(--brand)' : 'var(--neutral-chip)',
-              }}
+              className="inline-block rounded-full px-2.5 py-1 text-sm font-semibold uppercase tracking-wide"
+              style={{ background: 'var(--neutral-chip-soft)', color: 'var(--neutral-chip)' }}
             >
               {useCase.tag}
             </span>
