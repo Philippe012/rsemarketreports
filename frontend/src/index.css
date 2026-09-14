@@ -32,6 +32,16 @@
     --chart-axis: #8a8d91;
     --hero-glow-a: rgba(150, 120, 255, 0.30);
     --hero-glow-b: rgba(255, 150, 190, 0.26);
+    --accent-finance: #2f6fed;
+    --accent-finance-soft: #e8f0fe;
+    --accent-accounting: #b5790a;
+    --accent-accounting-soft: #fbf0e1;
+    --accent-logistics: #7c3aed;
+    --accent-logistics-soft: #f1eafe;
+    --accent-agriculture: #1a8a4a;
+    --accent-agriculture-soft: #e6f5ec;
+    --accent-generic: #5c5f63;
+    --accent-generic-soft: #eeeeec;
     color-scheme: light;
 }
 
@@ -68,11 +78,162 @@
     --chart-axis: #75797d;
     --hero-glow-a: rgba(130, 100, 255, 0.20);
     --hero-glow-b: rgba(255, 140, 190, 0.12);
+    --accent-finance: #7aa6ff;
+    --accent-finance-soft: #1a2338;
+    --accent-accounting: #e0a94b;
+    --accent-accounting-soft: #2a2214;
+    --accent-logistics: #b28dfa;
+    --accent-logistics-soft: #241c33;
+    --accent-agriculture: #5cc98a;
+    --accent-agriculture-soft: #16261c;
+    --accent-generic: #a4a8ac;
+    --accent-generic-soft: #232527;
     color-scheme: dark;
+}
+
+.usecases-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.usecases-backdrop::before {
+    content: '';
+    position: absolute;
+    width: 900px;
+    height: 500px;
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, -55%);
+    border-radius: 50%;
+    filter: blur(140px);
+    background: var(--hero-glow-a);
+    opacity: 0.6;
+}
+
+.usecase-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--surface) 0%, var(--card-tint, var(--surface)) 160%);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.usecase-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.08;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size: 120px 120px;
+    transition: opacity 0.25s ease;
+}
+
+.usecase-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
+}
+
+.usecase-card:hover::after {
+    opacity: 0.16;
+}
+
+.usecase-card>* {
+    position: relative;
+    z-index: 1;
+}
+
+.usecase-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .usecase-card {
+        transition: none;
+    }
+    .usecase-card:hover {
+        transform: none;
+    }
 }
 
 * {
     box-sizing: border-box;
+}
+
+.quality-glow-wrap {
+    position: relative;
+    isolation: isolate;
+}
+
+.quality-glow-wrap::before,
+.quality-glow-wrap::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    border-radius: 50%;
+    filter: blur(80px);
+}
+
+.quality-glow-wrap::before {
+    width: 55%;
+    height: 55%;
+    top: -14%;
+    right: -10%;
+    background: var(--hero-glow-a);
+    opacity: 0.7;
+}
+
+.quality-glow-wrap::after {
+    width: 45%;
+    height: 45%;
+    bottom: -12%;
+    left: -8%;
+    background: var(--hero-glow-b);
+    opacity: 0.6;
+}
+
+.quality-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.quality-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size: 120px 120px;
+}
+
+.quality-card>* {
+    position: relative;
+    z-index: 1;
+}
+
+.principle-item {
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.principle-item:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-hover);
 }
 
 html,
