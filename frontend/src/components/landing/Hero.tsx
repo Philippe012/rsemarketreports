@@ -66,10 +66,7 @@ export function Hero() {
               <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Q3 Sales Report</p>
               <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Excel · Processed</p>
             </div>
-            <span
-              className="rounded-full px-2.5 py-1 text-sm font-semibold uppercase tracking-wide"
-              style={{ background: 'var(--neutral-chip-soft)', color: 'var(--neutral-chip)' }}
-            >
+            <span className="glass-pill">
               Preview
             </span>
           </div>

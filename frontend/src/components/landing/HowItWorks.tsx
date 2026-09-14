@@ -1,5 +1,4 @@
-import { CheckCircle2, Download, FileSearch, LayoutDashboard, UploadCloud } from 'lucide-react';
-
+import { CheckCircle2, ChevronRight, Download, FileSearch, LayoutDashboard, UploadCloud } from 'lucide-react';
 import { Section } from './Section';
 
 const STEPS = [
@@ -18,22 +17,23 @@ export function HowItWorks() {
       heading="From document to dashboard in five steps"
       subheading="The same deterministic pipeline runs on every upload nothing is invented, and every number traces back to the source."
     >
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="steps-row">
         {STEPS.map((step, i) => (
-          <div key={step.title} className="relative">
-            <div className="flex items-center gap-2.5">
-              <div
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md"
-                style={{ background: 'var(--brand-soft)', color: 'var(--brand)' }}
-              >
-                <step.icon size={16} />
-              </div>
-              <span className="text-xs font-semibold tabular-nums" style={{ color: 'var(--text-muted)' }}>
-                {String(i + 1).padStart(2, '0')}
-              </span>
+          <div key={step.title} className="step-item">
+            <div className="step-connector" aria-hidden="true" />
+            <div className="step-chevron" aria-hidden="true">
+              <ChevronRight size={13} />
             </div>
-            <p className="mt-3 text-sm font-semibold" style={{ color: 'var(--text)' }}>{step.title}</p>
-            <p className="mt-1.5 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{step.description}</p>
+
+            <div className="step-circle">
+              <step.icon size={26} strokeWidth={1.75} />
+            </div>
+
+            <div className="step-text">
+              <p className="step-eyebrow">{`Step ${String(i + 1).padStart(2, '0')}`}</p>
+              <p className="step-title">{step.title}</p>
+              <p className="step-description">{step.description}</p>
+            </div>
           </div>
         ))}
       </div>

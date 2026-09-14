@@ -50,26 +50,23 @@ export function UseCases() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {USE_CASES.map((useCase) => {
           const Icon = useCase.icon;
+          const glowVars = {
+            '--card-tint': `var(--accent-${useCase.accent}-soft)`,
+            '--glow-a': `var(--accent-${useCase.accent})`,
+            '--glow-b': `var(--accent-${useCase.accent})`,
+          } as React.CSSProperties;
+
           return (
             <div
               key={useCase.title}
               className="usecase-card flex h-full flex-col rounded-2xl border p-5 sm:p-6"
-              style={{
-                borderColor: 'var(--border)',
-                '--card-tint': `var(--accent-${useCase.accent}-soft)`,
-              } as React.CSSProperties}
+              style={{ borderColor: 'var(--border)', ...glowVars }}
             >
               <div className="flex items-start justify-between gap-3">
-                <span
-                  className="usecase-icon"
-                  style={{ background: `var(--accent-${useCase.accent}-soft)` }}
-                >
+                <span className="glass-icon">
                   <Icon size={20} style={{ color: `var(--accent-${useCase.accent})` }} strokeWidth={2} />
                 </span>
-                <span
-                  className="inline-block rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide"
-                  style={{ background: `var(--accent-${useCase.accent}-soft)`, color: `var(--accent-${useCase.accent})` }}
-                >
+                <span className="glass-pill" style={{ color: `var(--accent-${useCase.accent})` }}>
                   {useCase.tag}
                 </span>
               </div>

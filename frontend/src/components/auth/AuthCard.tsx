@@ -16,23 +16,45 @@ export function AuthCard({
   footer?: ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12" style={{ background: 'var(--bg)' }}>
-      <Link to="/" className="mb-8 flex items-center gap-2.5">
+    <div
+      className="relative isolate flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-12"
+      style={{ background: 'var(--bg)' }}
+    >
+      <div className="hero-backdrop" aria-hidden="true" />
+
+      <Link to="/" className="relative z-10 mb-8 flex items-center gap-2.5">
         <img src={logoIcon} alt="Rebadata" className="h-9 w-9 rounded-lg object-contain" />
-        <span className="text-base font-semibold tracking-tight" style={{ color: 'var(--text)' }}>Rebadata</span>
+        <span className="text-base font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
+          Rebadata
+        </span>
       </Link>
 
       <div
-        className="w-full max-w-100 rounded-lg border p-7 animate-fade-in sm:p-8"
-        style={{ background: 'var(--surface)', borderColor: 'var(--border)', boxShadow: 'var(--shadow-sm)' }}
+        className="relative z-10 w-full max-w-100 rounded-lg border p-7 animate-fade-in sm:p-8"
+        style={{
+          background: 'var(--surface)',
+          borderColor: 'var(--border)',
+          boxShadow: 'var(--shadow-sm)',
+        }}
       >
-        <h1 className="text-xl font-semibold tracking-tight" style={{ color: 'var(--text)' }}>{title}</h1>
-        {subtitle && <p className="mt-1.5 text-sm" style={{ color: 'var(--text-secondary)' }}>{subtitle}</p>}
+        <h1 className="text-xl font-semibold tracking-tight" style={{ color: 'var(--text)' }}>
+          {title}
+        </h1>
+
+        {subtitle && (
+          <p className="mt-1.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
+            {subtitle}
+          </p>
+        )}
 
         <div className="mt-6">{children}</div>
       </div>
 
-      {footer && <div className="mt-6 text-sm" style={{ color: 'var(--text-secondary)' }}>{footer}</div>}
+      {footer && (
+        <div className="relative z-10 mt-6 text-sm" style={{ color: 'var(--text-secondary)' }}>
+          {footer}
+        </div>
+      )}
     </div>
   );
 }
