@@ -10,6 +10,7 @@ import { getApiErrorMessage } from '../../api/client';
 import { formatNumber, formatSignedNumber } from '../../utils/formatters';
 import type { CompareResult } from '../../types/intelligence';
 import type { ReportSummary } from '../../types/report';
+import { Dropdown } from '../common/Dropdown';
 
 export function TimeMachine({ reportId }: { reportId: string }) {
   const [candidates, setCandidates] = useState<ReportSummary[]>([]);
@@ -42,24 +43,31 @@ export function TimeMachine({ reportId }: { reportId: string }) {
       {candidates.length === 0 ? (
         <EmptyState message="Upload another completed report of the same kind to compare against." />
       ) : (
-        <div className="flex flex-wrap items-center gap-2">
-          <select
-            className="rounded-md border px-2.5 py-1.5 text-sm"
-            style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <Dropdown
+            className="w-full sm:w-80"
+            menuPlacement="up"
+            label="Report"
             value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-          >
-            <option value="">Select a report…</option>
-            {candidates.map((r) => (
-              <option key={r.id} value={r.id}>{r.original_filename}</option>
-            ))}
-          </select>
+            onChange={setSelected}
+            placeholder="Select a report..."
+            options={[
+              { value: '', label: 'Select a report...' },
+              ...candidates.map((report) => ({
+                value: report.id,
+                label: report.original_filename,
+              })),
+            ]}
+          />
           <button
             type="button"
             onClick={handleCompare}
             disabled={!selected || loading}
-            className="rounded-md px-3 py-1.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
-            style={{ background: 'var(--brand)' }}
+            className="inline-flex h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            style={{
+              background: 'var(--brand)',
+              color: 'var(--brand-contrast)',
+            }}
           >
             {loading ? <Spinner size={14} /> : 'Compare'}
           </button>

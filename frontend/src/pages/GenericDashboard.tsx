@@ -149,7 +149,7 @@ export function GenericDashboard({ report }: { report: GenericReport }) {
             <BrainCircuit size={16} /> Advanced Intelligence
           </h2>
           <p className="mt-0.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Deterministic analysis on top of the extracted data — nothing here invents a number.
+            Deterministic analysis on top of the extracted data nothing here invents a number.
           </p>
         </div>
         <IntelligencePanel
@@ -161,17 +161,21 @@ export function GenericDashboard({ report }: { report: GenericReport }) {
       </div>
 
       <div
-        className="flex flex-col items-center gap-3 rounded-lg border px-6 py-8 text-center animate-fade-in sm:flex-row sm:justify-between sm:text-left"
-        style={{ background: 'var(--brand-soft)', borderColor: 'var(--border)' }}
+        className="relative z-0 flex flex-col items-stretch gap-4 rounded-lg border px-6 py-6 text-left animate-fade-in sm:flex-row sm:items-center sm:justify-between"
+        style={{
+          background: 'var(--brand-soft)',
+          borderColor: 'var(--border)',
+        }}
       >
-        <div>
+        <div className="min-w-0">
           <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
             Reviewed everything? Export the full document.
           </p>
-          <p className="mt-0.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
             Downloads every dataset above as an organized Excel workbook.
           </p>
         </div>
+
         <ExportButton reportId={report.id} />
       </div>
     </div>

@@ -120,7 +120,7 @@ export function DocumentsTable({
 
   return (
     <div className="overflow-x-auto rounded-lg border" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
-      <table className="w-full min-w-[720px] text-left text-sm">
+      <table className="w-full min-180 text-left text-sm">
         <thead>
           <tr className="border-b text-xs" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
             <th className="w-10 px-4 py-3">
@@ -148,7 +148,7 @@ export function DocumentsTable({
                     aria-label={`Select ${report.original_filename}`}
                   />
                 </td>
-                <td className="max-w-[280px] px-2 py-3 align-top">
+                <td className="max-w-70 px-2 py-3 align-top">
                   <div className="flex items-start gap-2.5">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md" style={{ background: 'var(--neutral-icon)', color: 'var(--neutral-icon-fg)' }}>
                       <Icon size={14} />

@@ -57,15 +57,14 @@ export function IntelligencePanel({ reportId, metrics = [], charts = [], dataset
         <div>
           <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Advanced Intelligence</p>
           <p className="mt-1 max-w-md text-xs" style={{ color: 'var(--text-secondary)' }}>
-            One click runs Anomaly Radar, Data Forensics, Discoveries, Relationships, Geography, Vision, and more —
-            all computed deterministically from this document's own data.
+            One click runs Anomaly Radar, Data Forensics, Discoveries, Relationships, Geography, Vision, and more all computed deterministically from this document's own data.
           </p>
         </div>
         <button
           type="button"
           onClick={runInvestigation}
-          className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
-          style={{ background: 'var(--brand)' }}
+          className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition hover:opacity-90"
+          style={{ background: 'var(--brand)', color: 'var(--brand-contrast)' }}
         >
           <Search size={15} />
           Investigate Document

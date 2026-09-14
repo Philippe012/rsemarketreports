@@ -128,7 +128,7 @@ export function UploadZone({ status, progress, fileName, errorMessage, onFileSel
                 Drag & drop your document, or click to browse
               </p>
               <p className="mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                Reports, spreadsheets and datasets — RSE market reports get a specialized dashboard
+                Reports, spreadsheets and datasets with market reports to get a specialized dashboard
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-1 text-xs" style={{ color: 'var(--text-muted)' }}>

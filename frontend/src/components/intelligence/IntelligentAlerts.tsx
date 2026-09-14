@@ -62,7 +62,7 @@ export function IntelligentAlerts({
   return (
     <Card title="Intelligent Alerts" subtitle="Threshold rules evaluated live against this document's totals" icon={<Bell size={16} />}>
       {alerts.length === 0 ? (
-        <EmptyState message="No alerts set up yet — add one below." />
+        <EmptyState message="No alerts set up yet, add one below." />
       ) : (
         <ul className="mb-4 space-y-2">
           {alerts.map((alert) => (

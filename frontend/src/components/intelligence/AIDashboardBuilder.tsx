@@ -32,7 +32,7 @@ export function AIDashboardBuilder({ reportId, datasets }: { reportId: string; d
   const matchedDataset = result?.dataset ? datasets?.find((d) => d.name === result.dataset) : undefined;
 
   return (
-    <Card title="AI Dashboard Builder" subtitle="Describe what you want to see — matched against this document's own data" icon={<LayoutDashboard size={16} />}>
+    <Card title="AI Dashboard Builder" subtitle="Describe what you want to see matched against this document's own data" icon={<LayoutDashboard size={16} />}>
       <form onSubmit={handleSubmit} className="flex flex-wrap gap-2">
         <input
           className="min-w-0 flex-1 rounded-md border px-3 py-2 text-sm"
@@ -44,8 +44,8 @@ export function AIDashboardBuilder({ reportId, datasets }: { reportId: string; d
         <button
           type="submit"
           disabled={loading}
-          className="rounded-md px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
-          style={{ background: 'var(--brand)' }}
+          className="rounded-md px-4 py-2 text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
+          style={{ background: 'var(--brand)', color: 'var(--brand-contrast)' }}
         >
           {loading ? <Spinner size={14} /> : 'Build'}
         </button>

@@ -544,3 +544,25 @@ body {
         animation: none;
     }
 }
+
+.document-filter-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.document-filter-select:hover {
+    border-color: var(--border-strong);
+}
+
+.document-filter-select:focus {
+    border-color: var(--text);
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-strong) 35%, transparent);
+}
