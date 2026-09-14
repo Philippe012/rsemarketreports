@@ -38,13 +38,18 @@ function RowFilename({ report, onRename }: { report: Row; onRename: (id: string,
   if (!editing) {
     return (
       <div className="flex min-w-0 items-center gap-1.5">
-        <Link to={`/app/documents/${report.id}`} className="truncate text-sm font-medium hover:underline" style={{ color: 'var(--text)' }}>
+        <Link
+          to={`/app/documents/${report.id}`}
+          className="truncate text-sm font-medium hover:underline"
+          style={{ color: 'var(--text)' }}
+        >
           {report.original_filename}
         </Link>
+
         <button
           type="button"
-          onClick={(e) => {
-            e.preventDefault();
+          onClick={(event) => {
+            event.preventDefault();
             setDraft(report.original_filename);
             setEditing(true);
           }}
@@ -96,9 +101,6 @@ function RowFilename({ report, onRename }: { report: Row; onRename: (id: string,
   );
 }
 
-/** The documents table shared by the personal Documents page and the
- * staff-only admin management page — an `owner` column and filter are the
- * only thing that differs between the two, controlled by `showOwner`. */
 export function DocumentsTable({
   reports,
   selected,
@@ -117,84 +119,138 @@ export function DocumentsTable({
   showOwner?: boolean;
 }) {
   const allSelected = reports.length > 0 && reports.every((r) => selected.has(r.id));
+  const [pendingDelete, setPendingDelete] = useState<Row | null>(null);
 
   return (
-    <div className="overflow-x-auto rounded-lg border" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
-      <table className="w-full min-180 text-left text-sm">
-        <thead>
-          <tr className="border-b text-xs" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
-            <th className="w-10 px-4 py-3">
-              <input type="checkbox" checked={allSelected} onChange={onToggleSelectAll} aria-label="Select all" />
-            </th>
-            <th className="px-2 py-3 font-medium">Document</th>
-            <th className="px-3 py-3 font-medium">Type</th>
-            {showOwner && <th className="px-3 py-3 font-medium">Owner</th>}
-            <th className="px-3 py-3 font-medium">Date</th>
-            <th className="px-3 py-3 font-medium">Value</th>
-            <th className="px-3 py-3 font-medium">Status</th>
-            <th className="w-10 px-3 py-3" />
-          </tr>
-        </thead>
-        <tbody>
-          {reports.map((report) => {
-            const Icon = SOURCE_ICON[report.source_type];
-            return (
-              <tr key={report.id} className="border-b last:border-0 transition hover:opacity-95" style={{ borderColor: 'var(--border)' }}>
-                <td className="px-4 py-3 align-top">
-                  <input
-                    type="checkbox"
-                    checked={selected.has(report.id)}
-                    onChange={() => onToggleSelect(report.id)}
-                    aria-label={`Select ${report.original_filename}`}
-                  />
-                </td>
-                <td className="max-w-70 px-2 py-3 align-top">
-                  <div className="flex items-start gap-2.5">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md" style={{ background: 'var(--neutral-icon)', color: 'var(--neutral-icon-fg)' }}>
-                      <Icon size={14} />
-                    </div>
-                    <div className="min-w-0">
-                      <RowFilename report={report} onRename={onRename} />
-                      <p className="mt-0.5 text-sm" style={{ color: 'var(--text-muted)' }}>{report.source_type.toUpperCase()}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-3 py-3 align-top text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  {report.document_type || '—'}
-                </td>
-                {showOwner && (
-                  <td className="px-3 py-3 align-top text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    {report.owner_email ?? '—'}
+    <>
+      <div className="overflow-x-auto rounded-lg border" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+        <table className="w-full min-180 text-left text-sm">
+          <thead>
+            <tr className="border-b text-xs" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
+              <th className="w-10 px-4 py-3">
+                <input type="checkbox" checked={allSelected} onChange={onToggleSelectAll} aria-label="Select all" />
+              </th>
+              <th className="px-2 py-3 font-medium">Document</th>
+              <th className="px-3 py-3 font-medium">Type</th>
+              {showOwner && <th className="px-3 py-3 font-medium">Owner</th>}
+              <th className="px-3 py-3 font-medium">Date</th>
+              <th className="px-3 py-3 font-medium">Value</th>
+              <th className="px-3 py-3 font-medium">Status</th>
+              <th className="w-10 px-3 py-3" />
+            </tr>
+          </thead>
+          <tbody>
+            {reports.map((report) => {
+              const Icon = SOURCE_ICON[report.source_type];
+              return (
+                <tr key={report.id} className="border-b last:border-0 transition hover:opacity-95" style={{ borderColor: 'var(--border)' }}>
+                  <td className="px-4 py-3 align-top">
+                    <input
+                      type="checkbox"
+                      checked={selected.has(report.id)}
+                      onChange={() => onToggleSelect(report.id)}
+                      aria-label={`Select ${report.original_filename}`}
+                    />
                   </td>
-                )}
-                <td className="px-3 py-3 align-top text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  {report.report_date ? formatDate(report.report_date) : formatDate(report.created_at.slice(0, 10))}
-                </td>
-                <td className="px-3 py-3 align-top text-xs tabular-nums" style={{ color: 'var(--text-secondary)' }}>
-                  {report.headline_metric_value !== null ? (
-                    <span title={report.headline_metric_label}>{formatCompactNumber(report.headline_metric_value)}</span>
-                  ) : '—'}
-                </td>
-                <td className="px-3 py-3 align-top">
-                  <Badge tone={STATUS_TONE[report.status]}>{STATUS_LABEL[report.status]}</Badge>
-                </td>
-                <td className="px-3 py-3 align-top">
-                  <button
-                    type="button"
-                    onClick={() => onDelete(report.id)}
-                    className="flex h-7 w-7 items-center justify-center rounded-md transition hover:opacity-70"
-                    style={{ color: 'var(--negative)' }}
-                    aria-label={`Delete ${report.original_filename}`}
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                  <td className="max-w-70 px-2 py-3 align-top">
+                    <div className="flex items-start gap-2.5">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md" style={{ background: 'var(--neutral-icon)', color: 'var(--neutral-icon-fg)' }}>
+                        <Icon size={14} />
+                      </div>
+                      <div className="min-w-0">
+                        <RowFilename report={report} onRename={onRename} />
+                        <p className="mt-0.5 text-sm" style={{ color: 'var(--text-muted)' }}>{report.source_type.toUpperCase()}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-3 py-3 align-top text-xs" style={{ color: 'var(--text-secondary)' }}>
+                    {report.document_type || '—'}
+                  </td>
+                  {showOwner && (
+                    <td className="px-3 py-3 align-top text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      {report.owner_email ?? '—'}
+                    </td>
+                  )}
+                  <td className="px-3 py-3 align-top text-xs" style={{ color: 'var(--text-secondary)' }}>
+                    {report.report_date ? formatDate(report.report_date) : formatDate(report.created_at.slice(0, 10))}
+                  </td>
+                  <td className="px-3 py-3 align-top text-xs tabular-nums" style={{ color: 'var(--text-secondary)' }}>
+                    {report.headline_metric_value !== null ? (
+                      <span title={report.headline_metric_label}>{formatCompactNumber(report.headline_metric_value)}</span>
+                    ) : '—'}
+                  </td>
+                  <td className="px-3 py-3 align-top">
+                    <Badge tone={STATUS_TONE[report.status]}>{STATUS_LABEL[report.status]}</Badge>
+                  </td>
+                  <td className="px-3 py-3 align-top">
+                    <button
+                      type="button"
+                      onClick={() => setPendingDelete(report)}
+                      className="flex h-7 w-7 items-center justify-center rounded-md transition hover:opacity-70"
+                      style={{ color: 'var(--negative)' }}
+                      aria-label={`Delete ${report.original_filename}`}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {pendingDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          role="presentation"
+          onClick={() => setPendingDelete(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-document-title"
+            className="w-full max-w-sm rounded-xl border p-5 shadow-lg"
+            style={{
+              background: 'var(--surface)',
+              borderColor: 'var(--border)',
+            }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="delete-document-title" className="text-base font-semibold" style={{ color: 'var(--text)' }}>
+              Delete document?
+            </h2>
+
+            <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+              Delete "{pendingDelete.original_filename}"? This cannot be undone.
+            </p>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setPendingDelete(null)}
+                className="rounded-lg border px-3 py-2 text-sm font-medium transition hover:bg-(--surface-hover)"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onDelete(pendingDelete.id);
+                  setPendingDelete(null);
+                }}
+                className="rounded-lg px-3 py-2 text-sm font-semibold transition hover:opacity-90"
+                style={{ background: 'var(--negative)', color: 'var(--brand-contrast)' }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -27,10 +28,23 @@ export function Dropdown({
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const [menuPosition, setMenuPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+
+      if (
+        ref.current &&
+        !ref.current.contains(target) &&
+        menuRef.current &&
+        !menuRef.current.contains(target)
+      ) {
         setOpen(false);
       }
     }
@@ -41,6 +55,32 @@ export function Dropdown({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (!open || !ref.current) return;
+
+    function updateMenuPosition() {
+      if (!ref.current) return;
+
+      const rect = ref.current.getBoundingClientRect();
+
+      setMenuPosition({
+        top: menuPlacement === 'up' ? rect.top : rect.bottom + 8,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+
+    updateMenuPosition();
+
+    window.addEventListener('resize', updateMenuPosition);
+    window.addEventListener('scroll', updateMenuPosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updateMenuPosition);
+      window.removeEventListener('scroll', updateMenuPosition, true);
+    };
+  }, [open, menuPlacement]);
 
   const selectedOption = options.find((option) => option.value === value) ?? {
     value: '',
@@ -72,51 +112,58 @@ export function Dropdown({
         />
       </button>
 
-      {open && (
-        <div
-          role="listbox"
-          className={`absolute left-0 z-50 w-full max-h-64 overflow-y-auto overflow-x-hidden rounded-xl border shadow-lg ${
-            menuPlacement === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
-          }`}
-          
-          style={{
-            borderColor: 'var(--border)',
-            background: 'var(--surface)',
-            boxShadow: 'var(--shadow-md)',
-          }}
-        >
-          {options.map((option) => {
-            const active = option.value === value;
+      {open &&
+        createPortal(
+          <div
+            ref={menuRef}
+            role="listbox"
+            className="fixed z-[1000] max-h-64 overflow-y-auto overflow-x-hidden rounded-xl border shadow-lg"
+            style={{
+              top: menuPlacement === 'up' ? undefined : menuPosition.top,
+              bottom:
+                menuPlacement === 'up'
+                  ? window.innerHeight - menuPosition.top + 8
+                  : undefined,
+              left: menuPosition.left,
+              width: menuPosition.width,
+              borderColor: 'var(--border)',
+              background: 'var(--surface)',
+              boxShadow: 'var(--shadow-md)',
+            }}
+          >
+            {options.map((option) => {
+              const active = option.value === value;
 
-            return (
-              <button
-                key={option.value}
-                type="button"
-                role="option"
-                aria-selected={active}
-                onClick={() => {
-                  onChange(option.value);
-                  setOpen(false);
-                }}
-                className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition hover:bg-(--surface-hover)"
-                style={{
-                  color: active ? 'var(--brand)' : 'var(--text)',
-                  background: active ? 'var(--brand-soft)' : 'transparent',
-                }}
-              >
-                <span>{option.label}</span>
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  onClick={() => {
+                    onChange(option.value);
+                    setOpen(false);
+                  }}
+                  className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition hover:bg-(--surface-hover)"
+                  style={{
+                    color: active ? 'var(--brand)' : 'var(--text)',
+                    background: active ? 'var(--brand-soft)' : 'transparent',
+                  }}
+                >
+                  <span>{option.label}</span>
 
-                {active && (
-                  <span
-                    className="h-2 w-2 rounded-full"
-                    style={{ background: 'var(--brand)' }}
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      )}
+                  {active && (
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ background: 'var(--brand)' }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

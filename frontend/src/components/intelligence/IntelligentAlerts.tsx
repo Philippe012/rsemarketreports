@@ -8,6 +8,7 @@ import { createAlert, deleteAlert } from '../../api/analysis';
 import { getApiErrorMessage } from '../../api/client';
 import { formatNumber } from '../../utils/formatters';
 import type { AlertStatus } from '../../types/intelligence';
+import { Dropdown } from '../common/Dropdown';
 
 const OPERATOR_LABEL: Record<AlertStatus['operator'], string> = {
   gt: 'is greater than',
@@ -95,7 +96,7 @@ export function IntelligentAlerts({
         </ul>
       )}
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+      <form onSubmit={handleSubmit} className="relative z-40 grid grid-cols-2 gap-2 sm:grid-cols-5">
         <input
           className="rounded-md border px-2.5 py-1.5 text-sm sm:col-span-1"
           style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
@@ -111,16 +112,20 @@ export function IntelligentAlerts({
           style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
           placeholder="Column name" value={column} onChange={(e) => setColumn(e.target.value)}
         />
-        <select
-          className="rounded-md border px-2.5 py-1.5 text-sm"
-          style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text)' }}
-          value={operator} onChange={(e) => setOperator(e.target.value as AlertStatus['operator'])}
-        >
-          <option value="gt">greater than</option>
-          <option value="gte">at least</option>
-          <option value="lt">less than</option>
-          <option value="lte">at most</option>
-        </select>
+        <Dropdown
+          className="w-full"
+          menuPlacement="down"
+          label="Alert operator"
+          value={operator}
+          onChange={(value) => setOperator(value as AlertStatus['operator'])}
+          options={[
+            { value: 'gt', label: 'greater than' },
+            { value: 'gte', label: 'at least' },
+            { value: 'lt', label: 'less than' },
+            { value: 'lte', label: 'at most' },
+          ]}
+        />
+
         <div className="flex gap-2">
           <input
             className="w-full min-w-0 rounded-md border px-2.5 py-1.5 text-sm"
@@ -130,8 +135,11 @@ export function IntelligentAlerts({
           <button
             type="submit"
             disabled={submitting}
-            className="shrink-0 rounded-md px-3 py-1.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
-            style={{ background: 'var(--brand)' }}
+            className="shrink-0 rounded-md px-3 py-1.5 text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
+            style={{
+              background: 'var(--brand)',
+              color: 'var(--brand-contrast)',
+            }}
           >
             Add
           </button>

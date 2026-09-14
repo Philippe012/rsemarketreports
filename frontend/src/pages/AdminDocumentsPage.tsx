@@ -20,7 +20,6 @@ export function AdminDocumentsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this document? This cannot be undone.')) return;
     try {
       await bulkDeleteReports([id]);
       reload();
