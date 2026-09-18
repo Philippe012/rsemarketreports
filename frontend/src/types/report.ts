@@ -1,4 +1,4 @@
-export type SourceType = 'pdf' | 'excel' | 'csv' | 'docx' | 'txt';
+export type SourceType = 'pdf' | 'excel' | 'csv' | 'docx' | 'txt' | 'json';
 
 export type ReportStatus = 'pending' | 'processing' | 'completed' | 'failed';
 

@@ -52,7 +52,10 @@ def make_column(
     }
 
 
-def make_dataset(name: str, source: str, columns: List[dict], rows: List[dict], duplicate_row_count: int = 0) -> dict:
+def make_dataset(
+    name: str, source: str, columns: List[dict], rows: List[dict], duplicate_row_count: int = 0,
+    blank_rows_skipped: int = 0,
+) -> dict:
     return {
         'name': name,
         'source': source,
@@ -60,10 +63,18 @@ def make_dataset(name: str, source: str, columns: List[dict], rows: List[dict], 
         'rows': rows,
         'row_count': len(rows),
         'duplicate_row_count': duplicate_row_count,
+        # Rows present in the originally extracted table but skipped because
+        # every cell in them was blank — never a *data* loss (there was
+        # nothing to keep), but reported so "raw rows in vs. rows out" always
+        # reconciles instead of quietly shrinking.
+        'blank_rows_skipped': blank_rows_skipped,
     }
 
 
-def make_metric(label: str, value, dataset: str, column: str, kind: str, format_hint: str = 'number') -> dict:
+def make_metric(
+    label: str, value, dataset: str, column: str, kind: str, format_hint: str = 'number',
+    calculation_method: str = 'row_count', included_count: int = 0, excluded_count: int = 0,
+) -> dict:
     return {
         'label': label,
         'value': value,
@@ -71,6 +82,15 @@ def make_metric(label: str, value, dataset: str, column: str, kind: str, format_
         'column': column,
         'kind': kind,
         'format_hint': format_hint,  # 'number' | 'currency' | 'percentage' | 'quantity'
+        # How the value was actually derived, and over how many of the
+        # dataset's rows — e.g. a "Total Revenue" of 40,875,000 computed
+        # over 11 of 12 rows (one had an unparseable value) is a different,
+        # more auditable claim than a bare number with no accounting for
+        # the row that didn't count.
+        'calculation_method': calculation_method,
+        'included_row_count': included_count,
+        'excluded_row_count': excluded_count,
+        'validation_status': 'ok' if excluded_count == 0 else 'partial',
     }
 
 

@@ -6,6 +6,8 @@ from docx.oxml.ns import qn
 from docx.table import Table as _DocxTable
 from docx.text.paragraph import Paragraph as _DocxParagraph
 
+from .zip_guard import check_zip_bomb
+
 TableRows = List[List[str]]
 
 
@@ -39,6 +41,7 @@ def _table_to_rows(table: _DocxTable) -> TableRows:
 
 
 def extract_docx(file_path: str) -> DocxExtractionResult:
+    check_zip_bomb(file_path, DocxExtractionError)
     try:
         document = _DocxDocument(file_path)
     except Exception as exc:  # noqa: BLE001

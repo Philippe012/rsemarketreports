@@ -28,15 +28,22 @@ def compute_metrics(datasets: List[dict]) -> List[dict]:
             stats = column.get('stats')
             if not kind or not stats or stats.get('mean') is None:
                 continue
+            # `mean` was already computed by schema_inference over only the
+            # values that actually parsed as numbers — never over blanks or
+            # unparsed text — so `non_null_numeric` is both "how many values
+            # the aggregate covers" and the correct sum multiplier.
+            non_null_numeric = dataset['row_count'] - stats.get('missing_count', 0)
+            excluded = dataset['row_count'] - non_null_numeric
             if kind == 'average':
                 aggregate = stats['mean']
+                method = 'average_of_parsed_values'
             else:
                 # A column's sum is mean * count-of-non-null-numeric-values —
                 # the per-column stats block only keeps the aggregates
                 # (mean/min/max), not the raw series, so the total is
                 # reconstructed from them rather than re-parsing every row.
-                non_null_numeric = dataset['row_count'] - stats.get('missing_count', 0)
                 aggregate = stats['mean'] * non_null_numeric
+                method = 'sum_of_parsed_values'
             label_prefix = 'Average' if kind == 'average' else 'Total'
             metrics.append(make_metric(
                 label=f'{label_prefix} {column["display_name"]}',
@@ -45,6 +52,9 @@ def compute_metrics(datasets: List[dict]) -> List[dict]:
                 column=column['name'],
                 kind=kind,
                 format_hint=_FORMAT_HINT[semantic_type],
+                calculation_method=method,
+                included_count=non_null_numeric,
+                excluded_count=excluded,
             ))
         # A record-count metric per dataset is genuinely useful context and
         # costs nothing to compute.
@@ -55,6 +65,9 @@ def compute_metrics(datasets: List[dict]) -> List[dict]:
             column='',
             kind='count',
             format_hint='number',
+            calculation_method='row_count',
+            included_count=len(rows),
+            excluded_count=0,
         ))
 
     return metrics[:MAX_METRICS]

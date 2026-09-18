@@ -9,7 +9,7 @@ export function FinalCta() {
           Turn your next document into a dashboard.
         </h2>
         <p className="mx-auto mt-3 max-w-lg text-[15px]" style={{ color: 'var(--text-secondary)' }}>
-          Free to start. Upload your first PDF, Excel, Word, CSV or TXT file in under a minute.
+          Free to start. Upload your first PDF, Excel, Word, CSV, TXT or JSON file in under a minute.
         </p>
         <Link
           to="/signup"

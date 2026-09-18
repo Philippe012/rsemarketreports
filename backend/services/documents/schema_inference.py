@@ -45,6 +45,32 @@ _BOOLEAN_VALUES = {'true', 'false', 'yes', 'no', 'y', 'n', '0', '1', 'active', '
 _DATE_LIKE_RE = re.compile(
     r'[/\-]|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec', re.IGNORECASE
 )
+# A numeric date whose day and month parts are both <=12 (e.g. "03/04/2026")
+# is genuinely ambiguous — "3 April" under day-first reading (what parse_date
+# assumes) vs. "March 4th" under month-first reading — and no amount of
+# clever parsing resolves that without knowing the source locale, so this is
+# only ever used to *flag* the ambiguity, never to silently pick a side.
+_AMBIGUOUS_NUMERIC_DATE_RE = re.compile(r'^(\d{1,2})[/\-](\d{1,2})[/\-]\d{2,4}$')
+
+
+def _is_structurally_ambiguous_date(text: str) -> bool:
+    match = _AMBIGUOUS_NUMERIC_DATE_RE.match(text.strip())
+    if not match:
+        return False
+    first, second = int(match.group(1)), int(match.group(2))
+    return first <= 12 and second <= 12 and first != second
+
+# Non-numeric columns still carry a uniqueness/completeness stats block (so
+# duplicate-identifier detection has something to check) but never a
+# parse-failure or negative count — those only mean something for numbers.
+_NON_NUMERIC_STATS_BASE = {
+    'min': None, 'max': None, 'mean': None, 'std': None,
+    'unparsed_count': 0, 'negative_count': 0, 'ambiguous_date_count': 0,
+}
+
+
+def _text_stats(unique_count: int, missing_count: int) -> dict:
+    return {**_NON_NUMERIC_STATS_BASE, 'unique_count': unique_count, 'missing_count': missing_count}
 
 
 def _name_has_any(name: str, hints: Tuple[str, ...]) -> bool:
@@ -129,12 +155,26 @@ def infer_column(name: str, raw_values: List, total_count: Optional[int] = None)
             'std': float(np.std(clean_numeric)) if len(clean_numeric) > 1 else 0.0,
             'unique_count': int(clean_numeric.nunique()),
             'missing_count': total - numeric_hits,
+            # Present-but-unparsable text, distinct from genuinely blank
+            # cells — e.g. "N/A" in a revenue column — so validation can
+            # tell the two apart instead of lumping them into one count.
+            'unparsed_count': non_null_count - numeric_hits,
+            'negative_count': int((clean_numeric < 0).sum()),
+            'ambiguous_date_count': 0,
         }
 
     # Dates: most values parse as a date and it's a plausible date-shaped column.
     if date_ratio >= 0.8 and (numeric_ratio < 0.8 or _name_has_any(display_name, _DATE_NAME_HINTS)):
         column = make_column(name, display_name, 'date', 'date', non_null_count, total, sample_values, 'high')
-        column['stats'] = None
+        column['stats'] = {
+            **_NON_NUMERIC_STATS_BASE,
+            'unique_count': None,
+            'missing_count': total - date_hits,
+            # Present-but-unparsable text (e.g. a stray "TBD" in a date
+            # column), distinct from a genuinely blank cell.
+            'unparsed_count': non_null_count - date_hits,
+            'ambiguous_date_count': sum(1 for t in texts if _is_structurally_ambiguous_date(t)),
+        }
         return column
 
     # Booleans: a tiny, fixed vocabulary of yes/no-shaped values.
@@ -152,7 +192,8 @@ def infer_column(name: str, raw_values: List, total_count: Optional[int] = None)
         elif _name_has_any(display_name, _QUANTITY_NAME_HINTS):
             semantic_type, confidence = 'quantity', 'medium'
         elif _name_has_any(display_name, _IDENTIFIER_NAME_HINTS) and uniqueness_ratio > 0.9:
-            semantic_type, confidence, stats = 'identifier', 'medium', None
+            semantic_type, confidence = 'identifier', 'medium'
+            stats = _text_stats(len(unique_values), total - non_null_count)
         else:
             semantic_type, confidence = 'number', 'high'
         column = make_column(name, display_name, semantic_type, 'number', non_null_count, total, sample_values, confidence)
@@ -162,21 +203,20 @@ def infer_column(name: str, raw_values: List, total_count: Optional[int] = None)
     # Non-numeric text: identifier vs. category vs. free text.
     if _name_has_any(display_name, _IDENTIFIER_NAME_HINTS) and uniqueness_ratio > 0.9:
         column = make_column(name, display_name, 'identifier', 'string', non_null_count, total, sample_values, 'medium')
-        column['stats'] = None
+        column['stats'] = _text_stats(len(unique_values), total - non_null_count)
         return column
     if uniqueness_ratio > 0.95 and non_null_count > 5:
         # Nearly every value is unique with no identifier-style name — still
         # behaves like an identifier (e.g. a name or reference column).
         column = make_column(name, display_name, 'identifier', 'string', non_null_count, total, sample_values, 'low')
-        column['stats'] = None
+        column['stats'] = _text_stats(len(unique_values), total - non_null_count)
         return column
     # Low cardinality relative to row count reads as a dimension to group/filter by.
     if len(unique_values) <= max(20, non_null_count * 0.5):
         avg_len = sum(len(t) for t in texts) / non_null_count
         if avg_len <= 40:
             column = make_column(name, display_name, 'category', 'string', non_null_count, total, sample_values, 'medium')
-            column['stats'] = {'unique_count': len(unique_values), 'missing_count': total - non_null_count,
-                                'min': None, 'max': None, 'mean': None, 'std': None}
+            column['stats'] = _text_stats(len(unique_values), total - non_null_count)
             return column
 
     column = make_column(name, display_name, 'text', 'string', non_null_count, total, sample_values, 'medium')

@@ -1,7 +1,9 @@
+import ntpath
 import os
+import posixpath
 
 from django.conf import settings
-from django.http import FileResponse
+from django.http import FileResponse, JsonResponse
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
@@ -13,6 +15,7 @@ from services.documents.headline import compute_headline_metric
 from services.extraction.csv_extractor import CsvExtractionError
 from services.extraction.docx_extractor import DocxExtractionError
 from services.extraction.excel_extractor import ExcelExtractionError
+from services.extraction.json_extractor import JsonExtractionError
 from services.extraction.pdf_extractor import PdfExtractionError
 from services.extraction.txt_extractor import TxtExtractionError
 from services.intelligence.adapter import to_analysis_datasets
@@ -21,7 +24,14 @@ from services.intelligence.dashboard_builder import suggest_visualization
 from services.intelligence.explain import explain_chart, explain_metric
 from services.intelligence.timeline import compare_reports
 from services.normalization.validate_data import ReportValidationError
-from services.pipeline import UnsupportedFileType, detect_source_type, export_report_excel, process_report_file
+from services.pipeline import (
+    UnsupportedFileType,
+    compute_upload_hash,
+    detect_source_type,
+    export_report_excel,
+    process_report_file,
+    verify_upload_signature,
+)
 
 from .list_filters import apply_filters, apply_sort, available_facets, paginate
 from .models import AlertRule, ChatMessage, Report
@@ -38,8 +48,19 @@ MAX_CHAT_MESSAGE_LENGTH = 2000
 
 KNOWN_EXTRACTION_ERRORS = (
     PdfExtractionError, ExcelExtractionError, CsvExtractionError, DocxExtractionError,
-    TxtExtractionError, ReportValidationError, UnsupportedFileType,
+    TxtExtractionError, JsonExtractionError, ReportValidationError, UnsupportedFileType,
 )
+
+
+def _sanitize_filename(name: str) -> str:
+    """Strips any directory components a crafted filename might carry
+    (path traversal, e.g. "../../evil.pdf") and non-printable characters —
+    defense in depth on top of Django's own storage-level filename
+    sanitization, since this value is also shown back to the user and used
+    to build the downloaded workbook's filename."""
+    name = ntpath.basename(posixpath.basename(name or ''))
+    name = ''.join(c for c in name if c.isprintable())
+    return name.strip() or 'upload'
 
 
 class ReportUploadView(APIView):
@@ -54,21 +75,38 @@ class ReportUploadView(APIView):
             return Response({'detail': f'File is too large. The maximum accepted size is {max_mb}MB.'},
                              status=status.HTTP_400_BAD_REQUEST)
 
+        safe_filename = _sanitize_filename(upload.name)
         try:
-            source_type = detect_source_type(upload.name)
+            source_type = detect_source_type(safe_filename)
         except UnsupportedFileType as exc:
             return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
+        signature_error = verify_upload_signature(source_type, upload)
+        if signature_error:
+            return Response({'detail': signature_error}, status=status.HTTP_400_BAD_REQUEST)
+
+        file_hash = compute_upload_hash(upload)
+        existing = Report.objects.filter(
+            user=request.user, file_hash=file_hash, status=Report.Status.COMPLETED,
+        ).order_by('-created_at').first()
+        if existing:
+            # An identical file this user already successfully processed —
+            # returned as-is instead of reprocessed from scratch. 200 (not
+            # 201) signals "this already existed" to the client.
+            return Response(ReportSerializer(existing, context={'request': request}).data,
+                             status=status.HTTP_200_OK)
+
         report = Report.objects.create(
             user=request.user,
-            original_filename=upload.name,
+            original_filename=safe_filename,
             source_file=upload,
             source_type=source_type,
+            file_hash=file_hash,
             status=Report.Status.PROCESSING,
         )
 
         try:
-            result = process_report_file(report.source_file.path, upload.name)
+            result = process_report_file(report.source_file.path, safe_filename)
         except KNOWN_EXTRACTION_ERRORS as exc:
             report.status = Report.Status.FAILED
             report.error_message = str(exc)
@@ -192,7 +230,13 @@ class ReportDownloadView(APIView):
         if not report.generated_excel or not os.path.exists(report.generated_excel.path):
             filename = f'{report.id}.xlsx'
             output_path = os.path.join(settings.GENERATED_DIR, filename)
-            export_report_excel(report.extracted_data, output_path)
+            report_meta = {
+                'report_id': str(report.id),
+                'created_at': report.created_at,
+                'processed_at': report.processed_at,
+                'warnings': report.warnings,
+            }
+            export_report_excel(report.extracted_data, output_path, report_meta=report_meta)
             report.generated_excel.name = f'generated/{filename}'
             report.save(update_fields=['generated_excel'])
 
@@ -209,6 +253,37 @@ class ReportDownloadView(APIView):
             filename=download_name,
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         )
+
+
+class ReportJsonExportView(APIView):
+    """Machine-readable export of the same validated data the dashboard and
+    Excel workbook are built from — the extracted document plus its
+    validation warnings and processing metadata, never a re-derivation."""
+
+    def get(self, request, pk):
+        try:
+            report = Report.objects.get(pk=pk, user=request.user)
+        except Report.DoesNotExist:
+            return Response({'detail': 'Report not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if report.status != Report.Status.COMPLETED or not report.extracted_data:
+            return Response({'detail': 'This report has not completed processing yet.'},
+                             status=status.HTTP_409_CONFLICT)
+
+        payload = {
+            'report_id': str(report.id),
+            'original_filename': report.original_filename,
+            'source_type': report.source_type,
+            'processed_at': report.processed_at.isoformat() if report.processed_at else None,
+            'warnings': report.warnings,
+            'data': report.extracted_data,
+        }
+
+        base_name = os.path.splitext(report.original_filename)[0]
+        safe_name = ''.join(c if c.isalnum() or c in '-_ ' else '_' for c in base_name).strip() or 'document'
+        response = JsonResponse(payload, json_dumps_params={'indent': 2})
+        response['Content-Disposition'] = f'attachment; filename="{safe_name}_export.json"'
+        return response
 
 
 class ReportChatView(APIView):

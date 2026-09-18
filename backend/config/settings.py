@@ -124,6 +124,17 @@ GENERATED_DIR.mkdir(parents=True, exist_ok=True)
 
 MAX_UPLOAD_SIZE = 10 * 1024 * 1024
 
+# Defensive per-document shape limits, independent of MAX_UPLOAD_SIZE — a
+# file can be small in bytes but pathological in shape (e.g. a two-byte-per
+# -cell CSV with a million rows), so each extracted table is checked against
+# these before schema inference/validation/export ever run over it. Hit one
+# of these and the upload fails with a clear, specific error rather than the
+# server silently truncating data or grinding to a halt.
+MAX_TABLE_ROWS = 50_000
+MAX_TABLE_COLUMNS = 200
+MAX_SHEETS_PER_WORKBOOK = 200
+MAX_PDF_PAGES = 1000
+
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',

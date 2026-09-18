@@ -15,12 +15,15 @@ branching, and neither one ever fails simply because a document "isn't RSE".
 """
 from __future__ import annotations
 
+import hashlib
 import os
+from typing import Optional
 
 from services.documents.generic_parser import (
     parse_csv_document,
     parse_docx_document,
     parse_excel_document,
+    parse_json_document,
     parse_pdf_document,
     parse_txt_document,
 )
@@ -31,6 +34,7 @@ from services.export.generic_exporter import generate_generic_excel
 from services.extraction.csv_extractor import CsvExtractionError, extract_csv
 from services.extraction.docx_extractor import DocxExtractionError, extract_docx
 from services.extraction.excel_extractor import ExcelExtractionError, extract_excel
+from services.extraction.json_extractor import JsonExtractionError, extract_json
 from services.extraction.pdf_extractor import PdfExtractionError, extract_pdf
 from services.extraction.txt_extractor import TxtExtractionError, extract_txt
 from services.normalization.validate_data import ReportValidationError
@@ -41,26 +45,75 @@ SOURCE_TYPE_EXCEL = 'excel'
 SOURCE_TYPE_CSV = 'csv'
 SOURCE_TYPE_DOCX = 'docx'
 SOURCE_TYPE_TXT = 'txt'
+SOURCE_TYPE_JSON = 'json'
 
 # Formats that can never be an RSE report (RSE always ships as PDF or Excel)
 # and always route straight to the generic pipeline.
-GENERIC_ONLY_TYPES = {SOURCE_TYPE_CSV, SOURCE_TYPE_DOCX, SOURCE_TYPE_TXT}
+GENERIC_ONLY_TYPES = {SOURCE_TYPE_CSV, SOURCE_TYPE_DOCX, SOURCE_TYPE_TXT, SOURCE_TYPE_JSON}
 
 PDF_EXTENSIONS = {'.pdf'}
 EXCEL_EXTENSIONS = {'.xlsx', '.xls', '.xlsm'}
 CSV_EXTENSIONS = {'.csv'}
 DOCX_EXTENSIONS = {'.docx'}
 TXT_EXTENSIONS = {'.txt'}
+JSON_EXTENSIONS = {'.json', '.jsonl', '.ndjson'}
 
 _EXTRACTORS = {
     SOURCE_TYPE_CSV: (extract_csv, lambda extraction, name, path: parse_csv_document(extraction.rows, name)),
     SOURCE_TYPE_DOCX: (extract_docx, lambda extraction, name, path: parse_docx_document(extraction, name, path)),
     SOURCE_TYPE_TXT: (extract_txt, lambda extraction, name, path: parse_txt_document(extraction, name)),
+    SOURCE_TYPE_JSON: (extract_json, lambda extraction, name, path: parse_json_document(extraction, name)),
 }
 
 
 class UnsupportedFileType(Exception):
     pass
+
+
+def compute_upload_hash(upload) -> str:
+    """SHA-256 over an in-memory/temporary Django ``UploadedFile``'s bytes,
+    streamed via ``.chunks()`` so a large file is never loaded whole into
+    memory just to hash it. Leaves the upload's read position reset to the
+    start so it can still be saved normally afterward — see
+    reports.views.ReportUploadView, which uses this for exact-duplicate
+    detection (an identical re-upload short-circuits to the existing
+    report instead of being reprocessed from scratch)."""
+    digest = hashlib.sha256()
+    for chunk in upload.chunks():
+        digest.update(chunk)
+    upload.seek(0)
+    return digest.hexdigest()
+
+
+# Magic-byte signatures for the formats that have one — enough to catch a
+# file renamed to a different extension without a system-level dependency
+# like libmagic. CSV/TXT/JSON have no reliable signature (they're plain
+# text) and are deliberately not checked here.
+_ZIP_OR_OLE_SIGNATURES = (b'PK\x03\x04', b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1')
+_SIGNATURE_CHECKS = {
+    SOURCE_TYPE_PDF: lambda head: head.startswith(b'%PDF-'),
+    # .xlsx/.xlsm are zip archives (PK..); legacy .xls is an OLE2 compound
+    # file (the second signature) — both share the "excel" source type.
+    SOURCE_TYPE_EXCEL: lambda head: head.startswith(_ZIP_OR_OLE_SIGNATURES),
+    SOURCE_TYPE_DOCX: lambda head: head.startswith(b'PK\x03\x04'),
+}
+
+
+def verify_upload_signature(source_type: str, upload) -> Optional[str]:
+    """Returns an error message if the upload's actual bytes don't match
+    the signature expected for its claimed ``source_type``, or ``None`` if
+    they match (or the format has no reliable signature to check)."""
+    check = _SIGNATURE_CHECKS.get(source_type)
+    if not check:
+        return None
+    head = upload.read(8)
+    upload.seek(0)
+    if not check(head):
+        return (
+            f'This file\'s content doesn\'t match a {source_type.upper()} file, even though its name '
+            f'suggests one — it may have been renamed, corrupted, or is a different format entirely.'
+        )
+    return None
 
 
 def detect_source_type(filename: str) -> str:
@@ -75,8 +128,11 @@ def detect_source_type(filename: str) -> str:
         return SOURCE_TYPE_DOCX
     if ext in TXT_EXTENSIONS:
         return SOURCE_TYPE_TXT
+    if ext in JSON_EXTENSIONS:
+        return SOURCE_TYPE_JSON
     raise UnsupportedFileType(
-        f'Unsupported file type "{ext}". Please upload a PDF, Excel (.xlsx), Word (.docx), CSV or TXT document.'
+        f'Unsupported file type "{ext}". Please upload a PDF, Excel (.xlsx/.xls), Word (.docx), '
+        f'CSV, TXT, or JSON (.json/.jsonl) document.'
     )
 
 
@@ -108,9 +164,9 @@ def process_report_file(file_path: str, original_filename: str) -> dict:
     return {'source_type': source_type, 'data': document, 'warnings': warnings}
 
 
-def export_report_excel(data: dict, output_path: str) -> str:
+def export_report_excel(data: dict, output_path: str, report_meta: Optional[dict] = None) -> str:
     if data.get('kind') == 'generic_document':
-        return generate_generic_excel(data, output_path)
+        return generate_generic_excel(data, output_path, report_meta=report_meta)
     return generate_excel(data, output_path)
 
 
@@ -125,5 +181,6 @@ __all__ = [
     'CsvExtractionError',
     'DocxExtractionError',
     'TxtExtractionError',
+    'JsonExtractionError',
     'ReportValidationError',
 ]

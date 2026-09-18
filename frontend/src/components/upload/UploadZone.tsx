@@ -1,11 +1,11 @@
-import { FileSpreadsheet, FileText, FileType, Table, UploadCloud } from 'lucide-react';
+import { Braces, FileSpreadsheet, FileText, FileType, Table, UploadCloud } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 
 import { ErrorMessage } from '../common/ErrorMessage';
 import { Spinner } from '../common/Spinner';
 import type { UploadStatus } from '../../hooks/useReportUpload';
 
-const ACCEPTED_EXTENSIONS = ['.pdf', '.xlsx', '.xls', '.xlsm', '.docx', '.csv', '.txt'];
+const ACCEPTED_EXTENSIONS = ['.pdf', '.xlsx', '.xls', '.xlsm', '.docx', '.csv', '.txt', '.json', '.jsonl', '.ndjson'];
 
 interface UploadZoneProps {
   status: UploadStatus;
@@ -31,7 +31,7 @@ export function UploadZone({ status, progress, fileName, errorMessage, onFileSel
       const file = files?.[0];
       if (!file) return;
       if (!isAcceptedFile(file)) {
-        setLocalError('Unsupported file type. Please upload a PDF, Excel, Word (.docx), CSV or TXT document.');
+        setLocalError('Unsupported file type. Please upload a PDF, Excel, Word (.docx), CSV, TXT or JSON document.');
         return;
       }
       setLocalError(null);
@@ -146,6 +146,9 @@ export function UploadZone({ status, progress, fileName, errorMessage, onFileSel
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <FileText size={14} /> TXT
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Braces size={14} /> JSON
               </span>
             </div>
           </>

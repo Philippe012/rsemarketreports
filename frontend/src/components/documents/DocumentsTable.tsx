@@ -1,4 +1,4 @@
-import { Check, FileSpreadsheet, FileText, FileType, Pencil, Table, Trash2, UploadCloud, X } from 'lucide-react';
+import { Braces, Check, FileSpreadsheet, FileText, FileType, Pencil, Table, Trash2, UploadCloud, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -12,6 +12,7 @@ const SOURCE_ICON: Record<SourceType, typeof FileText> = {
   csv: Table,
   docx: FileType,
   txt: FileText,
+  json: Braces,
 };
 
 const STATUS_TONE: Record<ReportStatus, 'positive' | 'negative' | 'neutral'> = {

@@ -76,7 +76,7 @@ export function DocumentsPage() {
       {!error && !loading && data && data.results.length === 0 && (
         <EmptyState
           icon={<UploadCloud size={26} strokeWidth={1.5} />}
-          message={params.search ? `No documents match "${params.search}".` : 'No documents yet. Upload your first PDF, Excel, Word, CSV or TXT file to get started.'}
+          message={params.search ? `No documents match "${params.search}".` : 'No documents yet. Upload your first PDF, Excel, Word, CSV, TXT or JSON file to get started.'}
         />
       )}
 

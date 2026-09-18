@@ -70,3 +70,7 @@ export async function listAllReportsAdmin(
 export function getDownloadUrl(id: string): string {
   return `${apiClient.defaults.baseURL}/api/reports/${id}/download/`;
 }
+
+export function getJsonDownloadUrl(id: string): string {
+  return `${apiClient.defaults.baseURL}/api/reports/${id}/download/json/`;
+}

@@ -2,6 +2,8 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 
 def upload_path(instance, filename):
@@ -20,6 +22,7 @@ class Report(models.Model):
         CSV = 'csv', 'CSV'
         DOCX = 'docx', 'Word'
         TXT = 'txt', 'Text'
+        JSON = 'json', 'JSON'
 
     class Status(models.TextChoices):
         PENDING = 'pending', 'Pending'
@@ -36,6 +39,11 @@ class Report(models.Model):
     source_file = models.FileField(upload_to=upload_path)
     source_type = models.CharField(max_length=10, choices=SourceType.choices)
     status = models.CharField(max_length=12, choices=Status.choices, default=Status.PENDING)
+    # SHA-256 of the uploaded bytes, computed once at upload time — lets a
+    # re-upload of a file this user has already processed be recognized and
+    # short-circuited (see ReportUploadView) instead of reprocessed from
+    # scratch, without needing a job queue to make that idempotent.
+    file_hash = models.CharField(max_length=64, blank=True, default='', db_index=True)
 
     report_date = models.DateField(null=True, blank=True)
 
@@ -57,6 +65,18 @@ class Report(models.Model):
 
     def __str__(self):
         return f"{self.original_filename} ({self.status})"
+
+
+@receiver(post_delete, sender=Report)
+def _delete_report_files(sender, instance, **kwargs):
+    """Deleting a Report row (individually or via a bulk queryset delete —
+    post_delete fires for both) previously left its uploaded source file
+    and generated workbook orphaned on disk forever, since only the
+    database row was ever removed. Both are cleaned up here instead;
+    Django's default storage silently no-ops if a file is already gone."""
+    for field_file in (instance.source_file, instance.generated_excel):
+        if field_file:
+            field_file.storage.delete(field_file.name)
 
 
 class AlertRule(models.Model):

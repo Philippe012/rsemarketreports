@@ -20,6 +20,9 @@ class ColumnStats(BaseModel):
     std: Optional[float] = None
     unique_count: Optional[int] = None
     missing_count: int = 0
+    unparsed_count: int = 0
+    negative_count: int = 0
+    ambiguous_date_count: int = 0
 
 
 class ColumnModel(BaseModel):
@@ -54,6 +57,7 @@ class DatasetModel(BaseModel):
     rows: List[dict]
     row_count: int = Field(ge=0)
     duplicate_row_count: int = Field(default=0, ge=0)
+    blank_rows_skipped: int = Field(default=0, ge=0)
 
 
 class MetricModel(BaseModel):
@@ -65,6 +69,10 @@ class MetricModel(BaseModel):
     column: str
     kind: MetricKind
     format_hint: Literal['number', 'currency', 'percentage', 'quantity']
+    calculation_method: str = 'row_count'
+    included_row_count: int = Field(default=0, ge=0)
+    excluded_row_count: int = Field(default=0, ge=0)
+    validation_status: Literal['ok', 'partial'] = 'ok'
 
 
 class ChartModel(BaseModel):
@@ -94,6 +102,20 @@ class FigureModel(BaseModel):
     thumbnail: Optional[str] = None
 
 
+class ValidationIssueModel(BaseModel):
+    model_config = {'extra': 'forbid'}
+
+    rule_id: str
+    severity: Literal['info', 'warning', 'error']
+    message: str
+    dataset: Optional[str] = None
+    column: Optional[str] = None
+    row: Optional[int] = None
+    source: Optional[dict] = None
+    value: Any = None
+    suggested_action: Optional[str] = None
+
+
 class EntitiesModel(BaseModel):
     model_config = {'extra': 'forbid'}
 
@@ -107,7 +129,7 @@ class DocumentModel(BaseModel):
 
     kind: Literal['generic_document'] = 'generic_document'
     filename: str
-    source_type: Literal['pdf', 'excel', 'csv', 'docx', 'txt']
+    source_type: Literal['pdf', 'excel', 'csv', 'docx', 'txt', 'json']
     document_type: str
     document_type_confidence: Confidence
     sections: List[SectionModel]
@@ -117,6 +139,11 @@ class DocumentModel(BaseModel):
     figures: List[FigureModel] = Field(default_factory=list)
     insights: List[str] = Field(default_factory=list)
     entities: EntitiesModel = Field(default_factory=lambda: EntitiesModel())
+    # Populated by services.documents.validate.validate_document *after* this
+    # model's own validation already ran once (see that module's docstring)
+    # — declared here so the shape is documented and safe to re-validate
+    # against later, not because anything currently does so.
+    validation_issues: List[ValidationIssueModel] = Field(default_factory=list)
 
 
 def validate_document_shape(document: dict) -> dict:

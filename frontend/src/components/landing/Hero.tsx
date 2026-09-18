@@ -28,7 +28,7 @@ export function Hero() {
             Turn business documents into trusted data.
           </h1>
           <p className="mt-5 max-w-xl text-[16px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Upload a PDF, Excel, Word, CSV or TXT file. Rebadata extracts the text and tables,
+            Upload a PDF, Excel, Word, CSV, TXT or JSON file. Rebadata extracts the text and tables,
             validates every figure against its source, and builds structured datasets, KPIs and
             charts automatically, with nothing invented. Review what needs a second look, then
             export to Excel, CSV or JSON, or pull it in through the API.
@@ -52,7 +52,7 @@ export function Hero() {
             </a>
           </div>
           <p className="mt-5 text-xs" style={{ color: 'var(--text-muted)' }}>
-            No credit card required · PDF, Excel, Word, CSV and TXT supported
+            No credit card required · PDF, Excel, Word, CSV, TXT and JSON supported
           </p>
         </div>
 

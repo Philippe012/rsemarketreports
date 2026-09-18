@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-03-01T00:00:00Z",
+  "orders": [
+    {
+      "order_id": "ORD-1001",
+      "customer": "Ada Uwase",
+      "region": "East Africa",
+      "total": 128000,
+      "placed_on": "2026-01-05",
+      "line_items": [
+        {"sku": "SP-100", "qty": 2, "unit_price": 45000},
+        {"sku": "WP-200", "qty": 1, "unit_price": 38000}
+      ]
+    },
+    {
+      "order_id": "ORD-1002",
+      "customer": "Jean Bosco",
+      "region": "West Africa",
+      "total": 76000,
+      "placed_on": "2026-01-06",
+      "line_items": [
+        {"sku": "BP-300", "qty": 4, "unit_price": 19000}
+      ]
+    },
+    {
+      "order_id": "ORD-1003",
+      "customer": "Grace Umutoni",
+      "region": "Central Africa",
+      "total": 95000,
+      "placed_on": "2026-01-08",
+      "line_items": [
+        {"sku": "SP-100", "qty": 1, "unit_price": 45000},
+        {"sku": "BP-300", "qty": 2, "unit_price": 19000},
+        {"sku": "WP-200", "qty": 0.32, "unit_price": 38000}
+      ]
+    },
+    {
+      "order_id": "ORD-1004",
+      "customer": "Eric Niyonzima",
+      "region": "East Africa",
+      "total": 45000,
+      "placed_on": "2026-01-10",
+      "line_items": [
+        {"sku": "SP-100", "qty": 1, "unit_price": 45000}
+      ]
+    }
+  ]
+}
