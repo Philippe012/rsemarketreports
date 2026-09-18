@@ -1,10 +1,3 @@
-"""Tests for the Advanced Intelligence layer (services.intelligence):
-unit tests against synthetic data for the individual modules, plus
-end-to-end tests hitting the new API endpoints with the same real sample
-files the rest of the suite already trusts (backend/reports/tests.py,
-test_generic_documents.py) — one full upload -> /analysis/ round trip per
-pipeline kind.
-"""
 import os
 
 from django.conf import settings

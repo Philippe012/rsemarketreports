@@ -95,14 +95,12 @@ class GenericAnswerEngineTests(AuthenticatedTestCase):
 
     def test_never_invents_numbers_when_unsupported(self):
         result = answer_question(self.data, 'What will next quarter revenue be?')
-        # Either a grounded low-confidence refusal, or a genuine match — never a fabricated forecast number.
         self.assertNotIn('will be', result.answer.lower())
 
     def test_prose_only_document_falls_back_to_section_search(self):
         with open(PROSE_ONLY_TXT, 'rb') as f:
             report = self.client.post('/api/reports/upload/', {'file': f}, format='multipart').json()
         engine = get_answer_engine(report['extracted_data'])
-        # Should not crash even with no datasets, and should never fabricate a data-backed answer.
         result = engine.answer('What is this document about?')
         self.assertIsNotNone(result.answer)
 
