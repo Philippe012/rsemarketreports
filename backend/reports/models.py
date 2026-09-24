@@ -60,6 +60,16 @@ class Report(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     processed_at = models.DateTimeField(null=True, blank=True)
 
+    # RAG indexing state (see services.rag.indexing). Kept separate from
+    # `status` so a failed index never marks the report itself as failed.
+    class IndexStatus(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        INDEXED = 'indexed', 'Indexed'
+        FAILED = 'failed', 'Failed'
+
+    index_status = models.CharField(max_length=20, choices=IndexStatus.choices, default=IndexStatus.PENDING)
+    index_error = models.TextField(blank=True, default='')
+
     class Meta:
         ordering = ['-created_at']
 
@@ -125,3 +135,29 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f'{self.role}: {self.content[:40]}'
+
+
+class DocumentChunk(models.Model):
+    """One searchable passage of a report for RAG retrieval (see
+    services.rag). The embedding is stored as a JSON list of floats rather
+    than a pgvector column so the app keeps working on a Postgres without
+    the `vector` extension; ``embedding_model`` records which embedder
+    produced it so vectors from different models are never compared."""
+
+    report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name='chunks')
+    content = models.TextField()
+    page_number = models.IntegerField(null=True, blank=True)
+    section = models.CharField(max_length=255, blank=True, default='')
+    metadata = models.JSONField(default=dict, blank=True)
+    embedding = models.JSONField(default=list, blank=True)
+    embedding_model = models.CharField(max_length=100, blank=True, default='', db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['id']
+        indexes = [
+            models.Index(fields=['report']),
+        ]
+
+    def __str__(self):
+        return f'{self.report_id} · {self.section or "chunk"}'

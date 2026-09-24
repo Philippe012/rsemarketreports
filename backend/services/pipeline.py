@@ -1,18 +1,3 @@
-"""Wires extraction -> parsing -> validation together for a single uploaded
-document. Kept outside of Django views/models so the processing logic stays
-framework-agnostic and unit-testable on its own.
-
-Routing: a PDF or Excel file is first checked against a cheap, deterministic
-RSE-market-report signature (services.parsers.rse_parser.is_rse_report). If
-it matches, it runs through the specialized RSE pipeline that has existed
-from the start of this project — full RSE domain knowledge, unchanged. If it
-doesn't match — or the file is CSV/DOCX/TXT, none of which ever carry an RSE
-report — it runs through the generic document-intelligence pipeline
-(services.documents), which builds a Document of arbitrary datasets/
-columns/metrics/charts instead of the RSE-shaped schema. Both pipelines are
-validated with the same ReportValidationError, so the view layer needs no
-branching, and neither one ever fails simply because a document "isn't RSE".
-"""
 from __future__ import annotations
 
 import hashlib
@@ -47,8 +32,6 @@ SOURCE_TYPE_DOCX = 'docx'
 SOURCE_TYPE_TXT = 'txt'
 SOURCE_TYPE_JSON = 'json'
 
-# Formats that can never be an RSE report (RSE always ships as PDF or Excel)
-# and always route straight to the generic pipeline.
 GENERIC_ONLY_TYPES = {SOURCE_TYPE_CSV, SOURCE_TYPE_DOCX, SOURCE_TYPE_TXT, SOURCE_TYPE_JSON}
 
 PDF_EXTENSIONS = {'.pdf'}
@@ -71,13 +54,6 @@ class UnsupportedFileType(Exception):
 
 
 def compute_upload_hash(upload) -> str:
-    """SHA-256 over an in-memory/temporary Django ``UploadedFile``'s bytes,
-    streamed via ``.chunks()`` so a large file is never loaded whole into
-    memory just to hash it. Leaves the upload's read position reset to the
-    start so it can still be saved normally afterward — see
-    reports.views.ReportUploadView, which uses this for exact-duplicate
-    detection (an identical re-upload short-circuits to the existing
-    report instead of being reprocessed from scratch)."""
     digest = hashlib.sha256()
     for chunk in upload.chunks():
         digest.update(chunk)
@@ -85,24 +61,15 @@ def compute_upload_hash(upload) -> str:
     return digest.hexdigest()
 
 
-# Magic-byte signatures for the formats that have one — enough to catch a
-# file renamed to a different extension without a system-level dependency
-# like libmagic. CSV/TXT/JSON have no reliable signature (they're plain
-# text) and are deliberately not checked here.
 _ZIP_OR_OLE_SIGNATURES = (b'PK\x03\x04', b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1')
 _SIGNATURE_CHECKS = {
     SOURCE_TYPE_PDF: lambda head: head.startswith(b'%PDF-'),
-    # .xlsx/.xlsm are zip archives (PK..); legacy .xls is an OLE2 compound
-    # file (the second signature) — both share the "excel" source type.
     SOURCE_TYPE_EXCEL: lambda head: head.startswith(_ZIP_OR_OLE_SIGNATURES),
     SOURCE_TYPE_DOCX: lambda head: head.startswith(b'PK\x03\x04'),
 }
 
 
 def verify_upload_signature(source_type: str, upload) -> Optional[str]:
-    """Returns an error message if the upload's actual bytes don't match
-    the signature expected for its claimed ``source_type``, or ``None`` if
-    they match (or the format has no reliable signature to check)."""
     check = _SIGNATURE_CHECKS.get(source_type)
     if not check:
         return None

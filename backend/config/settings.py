@@ -1,10 +1,17 @@
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
+
+# The test suite must never call (or pay for) the OpenAI API, even when a
+# developer's .env has a key — RAG falls back to its offline embedder.
+if 'test' in sys.argv[1:2]:
+    os.environ['RAG_EMBEDDINGS'] = 'local'
+    os.environ['RAG_LLM'] = 'off'
 
 SECRET_KEY = 'django-insecure-yt!ryyp^1#s!vbwe5c*my!a2pn@_^omo^06q*!1zc8^@73st=l'
 

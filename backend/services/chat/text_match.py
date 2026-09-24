@@ -1,9 +1,3 @@
-"""Small, dependency-free keyword-matching helpers shared by every
-deterministic answer engine — deliberately simple (lowercase word overlap,
-no stemming/embeddings) since Phase 1 explicitly has no RAG/vector search.
-"""
-from __future__ import annotations
-
 import re
 from typing import Iterable, List, Set
 

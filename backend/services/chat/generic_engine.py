@@ -245,7 +245,6 @@ class GenericAnswerEngine(AnswerEngine):
             Source('Extracted entities', 'Keywords'),
         )
 
-    # -- narrative fallback -----------------------------------------------------
 
     def _search_sections(self, question: str) -> Optional[AnswerResult]:
         if not self._sections:

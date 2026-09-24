@@ -52,9 +52,11 @@ def _period_jumps(dataset: dict, date_column: dict, measure_column: dict) -> Lis
     for i in range(1, len(points)):
         prev_date, prev_value, _ = points[i - 1]
         cur_date, cur_value, row_index = points[i]
+        
         if prev_value == 0:
             continue
         change = (cur_value - prev_value) / abs(prev_value)
+        
         if abs(change) < JUMP_THRESHOLD:
             continue
         severity = 'high' if abs(change) >= JUMP_HIGH_SEVERITY else 'medium'

@@ -10,6 +10,8 @@ from services.chat.engine import get_answer_engine
 from services.chat.fact_index import FactIndex
 from services.chat.service import answer_question, suggested_questions
 
+from django.contrib.auth import get_user_model
+
 SAMPLE_DIR = os.path.join(settings.BASE_DIR.parent, 'sample_data')
 SAMPLE_PDF = os.path.join(SAMPLE_DIR, 'RSE_sample.pdf')
 SALES_CSV = os.path.join(SAMPLE_DIR, 'generic_sales_sample.csv')
@@ -139,7 +141,6 @@ class ChatEndpointTests(AuthenticatedTestCase):
 
     def test_chat_scoped_to_owner_only(self):
         self.client.logout()
-        from django.contrib.auth import get_user_model
         User = get_user_model()
         User.objects.create_user(username='intruder@example.com', email='intruder@example.com', password='intruder-pass-123')
         self.client.login(username='intruder@example.com', password='intruder-pass-123')

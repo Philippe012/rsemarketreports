@@ -24,6 +24,7 @@ from services.intelligence.dashboard_builder import suggest_visualization
 from services.intelligence.explain import explain_chart, explain_metric
 from services.intelligence.timeline import compare_reports
 from services.normalization.validate_data import ReportValidationError
+from services.rag.indexing import index_report
 from services.pipeline import (
     UnsupportedFileType,
     compute_upload_hash,
@@ -45,6 +46,7 @@ from .serializers import (
 )
 
 MAX_CHAT_MESSAGE_LENGTH = 2000
+CHAT_HISTORY_TURNS = 8
 
 KNOWN_EXTRACTION_ERRORS = (
     PdfExtractionError, ExcelExtractionError, CsvExtractionError, DocxExtractionError,
@@ -135,6 +137,10 @@ class ReportUploadView(APIView):
             'status', 'extracted_data', 'warnings', 'report_date',
             'headline_metric_label', 'headline_metric_value', 'processed_at',
         ])
+
+        # RAG chunks + embeddings. Never raises — a failure is recorded on
+        # report.index_status and retried lazily on the next chat request.
+        index_report(report)
 
         return Response(ReportSerializer(report, context={'request': request}).data,
                          status=status.HTTP_201_CREATED)
@@ -322,8 +328,16 @@ class ReportChatView(APIView):
             return Response({'detail': f'Questions are limited to {MAX_CHAT_MESSAGE_LENGTH} characters.'},
                              status=status.HTTP_400_BAD_REQUEST)
 
+        scope = request.data.get('scope') or chat_service.SCOPE_DOCUMENT
+        if scope not in chat_service.CHAT_SCOPES:
+            return Response({'detail': f'"scope" must be one of: {", ".join(chat_service.CHAT_SCOPES)}.'},
+                             status=status.HTTP_400_BAD_REQUEST)
+
+        recent = list(report.chat_messages.order_by('-created_at')[:CHAT_HISTORY_TURNS])
+        history = [{'role': m.role, 'content': m.content} for m in reversed(recent)]
+
         user_message = ChatMessage.objects.create(report=report, role=ChatMessage.Role.USER, content=question)
-        result = chat_service.answer_question(report.extracted_data, question)
+        result = chat_service.answer_chat(request.user, report, question, scope=scope, history=history)
         assistant_message = ChatMessage.objects.create(
             report=report,
             role=ChatMessage.Role.ASSISTANT,
