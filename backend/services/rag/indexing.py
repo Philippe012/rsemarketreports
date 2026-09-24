@@ -6,9 +6,7 @@ from __future__ import annotations
 import logging
 
 from django.db import transaction
-
 from reports.models import DocumentChunk, Report
-
 from .chunking import build_chunks, chunk_texts
 from .embeddings import embed_texts
 
@@ -39,7 +37,7 @@ def index_report(report: Report) -> bool:
             report.index_error = ''
             report.save(update_fields=['index_status', 'index_error'])
         return True
-    except Exception as exc:  # recorded, never propagated
+    except Exception as exc:
         logger.exception('RAG indexing failed for report %s', report.pk)
         report.index_status = Report.IndexStatus.FAILED
         report.index_error = str(exc)[:2000]
@@ -48,9 +46,6 @@ def index_report(report: Report) -> bool:
 
 
 def ensure_indexed(report: Report) -> None:
-    """Lazily indexes a completed report that predates RAG. Switching
-    embedders is done explicitly with ``manage.py rag_index --all``, not
-    here, so a failing API is never retried on every chat message."""
     if report.status != Report.Status.COMPLETED or not report.extracted_data:
         return
     if report.index_status == Report.IndexStatus.PENDING:

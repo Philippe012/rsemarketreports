@@ -61,7 +61,7 @@ def split_text(text: str, max_chars: int = MAX_CHUNK_CHARS, overlap: int = CHUNK
     return pieces
 
 
-# -- RSE market reports -------------------------------------------------------
+# RSE market reports
 
 def _rse_chunks(data: dict, filename: str) -> List[dict]:
     chunks: List[dict] = []
@@ -149,7 +149,7 @@ def _rse_chunks(data: dict, filename: str) -> List[dict]:
     return chunks
 
 
-# -- generic documents --------------------------------------------------------
+# generic documents
 
 def _section_chunks(data: dict, filename: str) -> List[dict]:
     chunks: List[dict] = []
@@ -215,7 +215,7 @@ def _insight_chunks(data: dict, filename: str, prefix: str = '') -> List[dict]:
     return [_chunk(f'{prefix} Insights: ' + ' '.join(insights), 'Insights', filename)]
 
 
-# -- entry point ----------------------------------------------------------------
+# entry point
 
 def build_chunks(extracted_data: Optional[dict], filename: str) -> List[dict]:
     data = extracted_data or {}
